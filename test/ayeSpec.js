@@ -27,5 +27,39 @@ describe("aye", function () {
 
             expect(function () { defer.promise.valueOf() }).toThrow(new Error("Promise hasn't been resolved yet"));
         });
+
+        it("should execute a given function once resolved", function () {
+            var defer = aye.defer(),
+                spy = jasmine.createSpy("call me");
+
+            defer.promise.then(spy);
+
+            expect(spy).not.toHaveBeenCalled();
+
+            defer.resolve();
+
+            expect(spy).toHaveBeenCalled();
+        });
+
+        it("should pass the result to the callback", function () {
+            var defer = aye.defer(),
+                spy = jasmine.createSpy("call me");
+
+            defer.promise.then(spy);
+
+            defer.resolve("half the truth");
+
+            expect(spy).toHaveBeenCalledWith("half the truth");
+        });
+
+        it("should trigger the callback even when passed after the promise has been resolved", function () {
+            var defer = aye.defer(),
+                spy = jasmine.createSpy("call me");
+
+            defer.resolve();
+            defer.promise.then(spy);
+
+            expect(spy).toHaveBeenCalled();
+        });
     });
 });

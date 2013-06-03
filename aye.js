@@ -3,12 +3,17 @@ window.aye = (function () {
 
     aye.defer = function () {
         var pending = true,
-            result = null;
+            result = null,
+            thenCallback;
 
         return {
             resolve: function (value) {
                 pending = false;
                 result = value;
+
+                if (thenCallback) {
+                    thenCallback(result);
+                }
             },
             promise: {
                 isPending: function () {
@@ -19,6 +24,13 @@ window.aye = (function () {
                         throw new Error("Promise hasn't been resolved yet");
                     }
                     return result;
+                },
+                then: function (callback) {
+                    thenCallback = callback;
+
+                    if (!pending) {
+                        thenCallback(result);
+                    }
                 }
             }
         };
