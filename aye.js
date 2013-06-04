@@ -4,15 +4,19 @@ window.aye = (function () {
     aye.defer = function () {
         var pending = true,
             result = null,
-            thenCallbacks = [];
+            downstream = [];
+
+        var doChainCall = function (downstreamElement) {
+            downstreamElement.defer.resolve(downstreamElement.callback(result));
+        };
 
         return {
             resolve: function (value) {
                 pending = false;
                 result = value;
 
-                thenCallbacks.forEach(function (callback) {
-                    callback(result);
+                downstream.forEach(function (downstreamElement) {
+                    doChainCall(downstreamElement);
                 });
             },
             promise: {
@@ -26,11 +30,17 @@ window.aye = (function () {
                     return result;
                 },
                 then: function (callback) {
-                    thenCallbacks.push(callback);
+                    var downstreamElement = {
+                        defer: aye.defer(),
+                        callback: callback
+                    };
+
+                    downstream.push(downstreamElement);
 
                     if (!pending) {
-                        callback(result);
+                        doChainCall(downstreamElement);
                     }
+                    return downstreamElement.defer.promise;
                 }
             }
         };

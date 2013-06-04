@@ -75,5 +75,48 @@ describe("aye", function () {
             expect(spy).toHaveBeenCalled();
             expect(yetAnotherSpy).toHaveBeenCalled();
         });
+
+        it("should allow pipelining", function () {
+            var defer = aye.defer(),
+                spy = jasmine.createSpy("call me"),
+                yetAnotherSpy = jasmine.createSpy("call me after the other spy finished"),
+                followingPromise;
+
+            followingPromise = defer.promise.then(spy);
+            followingPromise.then(yetAnotherSpy);
+
+            defer.resolve();
+
+            expect(spy).toHaveBeenCalled();
+            expect(yetAnotherSpy).toHaveBeenCalled();
+        });
+
+        it("should pass the result of one call as argument to the following", function () {
+            var defer = aye.defer(),
+                spy = jasmine.createSpy("call me").andReturn(42),
+                yetAnotherSpy = jasmine.createSpy("call me after the other spy finished");
+
+            defer.promise
+                .then(spy)
+                .then(yetAnotherSpy);
+
+            defer.resolve();
+
+            expect(yetAnotherSpy).toHaveBeenCalledWith(42);
+        });
+
+        it("should pass the result of one call as argument to the following, also for a already resolved promise", function () {
+            var defer = aye.defer(),
+                spy = jasmine.createSpy("call me").andReturn(42),
+                yetAnotherSpy = jasmine.createSpy("call me after the other spy finished");
+
+            defer.resolve();
+
+            defer.promise
+                .then(spy)
+                .then(yetAnotherSpy);
+
+            expect(yetAnotherSpy).toHaveBeenCalledWith(42);
+        });
     });
 });
