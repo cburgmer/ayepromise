@@ -61,5 +61,19 @@ describe("aye", function () {
 
             expect(spy).toHaveBeenCalled();
         });
+
+        it("should handle multiple callbacks", function () {
+            var defer = aye.defer(),
+                spy = jasmine.createSpy("call me"),
+                yetAnotherSpy = jasmine.createSpy("call me too");
+
+            defer.promise.then(spy);
+            defer.promise.then(yetAnotherSpy);
+
+            defer.resolve();
+
+            expect(spy).toHaveBeenCalled();
+            expect(yetAnotherSpy).toHaveBeenCalled();
+        });
     });
 });

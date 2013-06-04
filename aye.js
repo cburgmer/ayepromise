@@ -4,16 +4,16 @@ window.aye = (function () {
     aye.defer = function () {
         var pending = true,
             result = null,
-            thenCallback;
+            thenCallbacks = [];
 
         return {
             resolve: function (value) {
                 pending = false;
                 result = value;
 
-                if (thenCallback) {
-                    thenCallback(result);
-                }
+                thenCallbacks.forEach(function (callback) {
+                    callback(result);
+                });
             },
             promise: {
                 isPending: function () {
@@ -26,10 +26,10 @@ window.aye = (function () {
                     return result;
                 },
                 then: function (callback) {
-                    thenCallback = callback;
+                    thenCallbacks.push(callback);
 
                     if (!pending) {
-                        thenCallback(result);
+                        callback(result);
                     }
                 }
             }
