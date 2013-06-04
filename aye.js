@@ -1,22 +1,28 @@
 window.aye = (function () {
     var aye = {};
 
+    var callChainLink = function (func) {
+        var defer = aye.defer();
+        return {
+            promise: defer.promise,
+            call: function (value) {
+                defer.resolve(func(value));
+            }
+        }
+    };
+
     aye.defer = function () {
         var pending = true,
             result = null,
-            downstream = [];
-
-        var doChainCall = function (downstreamElement) {
-            downstreamElement.defer.resolve(downstreamElement.callback(result));
-        };
+            downstreamLinks = [];
 
         return {
             resolve: function (value) {
                 pending = false;
                 result = value;
 
-                downstream.forEach(function (downstreamElement) {
-                    doChainCall(downstreamElement);
+                downstreamLinks.forEach(function (link) {
+                    link.call(result);
                 });
             },
             promise: {
@@ -30,17 +36,14 @@ window.aye = (function () {
                     return result;
                 },
                 then: function (callback) {
-                    var downstreamElement = {
-                        defer: aye.defer(),
-                        callback: callback
-                    };
+                    var link = callChainLink(callback);
 
-                    downstream.push(downstreamElement);
+                    downstreamLinks.push(link);
 
                     if (!pending) {
-                        doChainCall(downstreamElement);
+                        link.call(result);
                     }
-                    return downstreamElement.defer.promise;
+                    return link.promise;
                 }
             }
         };
