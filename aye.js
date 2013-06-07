@@ -38,6 +38,12 @@ window.aye = (function () {
                     link.call(result);
                 });
             },
+            reject: function (value) {
+                pending = false;
+                result = {
+                    exception: value
+                }
+            },
             promise: {
                 isPending: function () {
                     return pending;

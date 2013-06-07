@@ -216,5 +216,23 @@ describe(libraryName, function () {
                 expect(yetAnotherSpy).toHaveBeenCalledWith("hey there");
             });
         });
+
+        describe("error handling", function () {
+            it("should resolve promise on reject", function () {
+                var defer = aye.defer();
+
+                defer.reject();
+
+                expect(defer.promise.isPending()).toBe(false);
+            });
+
+            it("should return the error", function () {
+                var defer = aye.defer();
+
+                defer.reject(21);
+
+                expect(defer.promise.valueOf().exception).toBe(21);
+            });
+        });
     });
 });
