@@ -233,6 +233,93 @@ describe(libraryName, function () {
 
                 expect(defer.promise.valueOf().exception).toBe(21);
             });
+
+            it("should execute a fail callback", function () {
+                var defer = aye.defer(),
+                    spy = jasmine.createSpy("fail callback");
+
+                defer.promise.fail(spy);
+
+                defer.reject();
+
+                waitsFor(function () {
+                    return spy.wasCalled;
+                });
+
+                runs(function () {
+                    expect(spy).toHaveBeenCalled();
+                });
+            });
+
+            it("should pass the error to the fail callback", function () {
+                var defer = aye.defer(),
+                    spy = jasmine.createSpy("call me"),
+                    error = new Error("didn't work out, sorry");
+
+                defer.promise.fail(spy);
+
+                defer.reject(error);
+
+                waitsFor(function () {
+                    return spy.wasCalled;
+                });
+
+                runs(function () {
+                    expect(spy).toHaveBeenCalledWith(error);
+                });
+            });
+
+            it("should trigger the fail callback even when passed after the promise has been resolved", function () {
+                var defer = aye.defer(),
+                    spy = jasmine.createSpy("call me");
+
+                defer.reject();
+                defer.promise.fail(spy);
+
+                waitsFor(function () {
+                    return spy.wasCalled;
+                });
+
+                runs(function () {
+                    expect(spy).toHaveBeenCalled();
+                });
+            });
+
+            it("should not trigger fail callback passed after promise has been fulfilled", function () {
+                var defer = aye.defer(),
+                    spy = jasmine.createSpy("don't call me"),
+                    successSpy = jasmine.createSpy("call me");
+
+                defer.resolve();
+                defer.promise.then(successSpy)
+                defer.promise.fail(spy);
+
+                waitsFor(function () {
+                    return successSpy.wasCalled;
+                });
+
+                runs(function () {
+                    expect(spy).not.toHaveBeenCalled();
+                });
+            });
+
+            it("should not trigger then callback passed after promise has been rejected", function () {
+                var defer = aye.defer(),
+                    spy = jasmine.createSpy("don't call me"),
+                    failSpy = jasmine.createSpy("call me");
+
+                defer.reject();
+                defer.promise.then(spy)
+                defer.promise.fail(failSpy);
+
+                waitsFor(function () {
+                    return failSpy.wasCalled;
+                });
+
+                runs(function () {
+                    expect(spy).not.toHaveBeenCalled();
+                });
+            });
         });
     });
 });

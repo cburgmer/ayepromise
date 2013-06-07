@@ -26,12 +26,15 @@ window.aye = (function () {
 
     aye.defer = function () {
         var pending = true,
+            fulfilled,
             result = null,
-            downstreamLinks = [];
+            downstreamLinks = [],
+            failCallback;
 
         return {
             resolve: function (value) {
                 pending = false;
+                fulfilled = true;
                 result = value;
 
                 downstreamLinks.forEach(function (link) {
@@ -40,8 +43,13 @@ window.aye = (function () {
             },
             reject: function (value) {
                 pending = false;
+                fulfilled = false;
                 result = {
                     exception: value
+                }
+
+                if (failCallback) {
+                    failCallback(value);
                 }
             },
             promise: {
@@ -59,10 +67,17 @@ window.aye = (function () {
 
                     downstreamLinks.push(link);
 
-                    if (!pending) {
+                    if (!pending && fulfilled) {
                         link.call(result);
                     }
                     return link.promise;
+                },
+                fail: function (callback) {
+                    failCallback = callback;
+
+                    if (!pending && !fulfilled) {
+                        failCallback(result);
+                    }
                 }
             }
         };
