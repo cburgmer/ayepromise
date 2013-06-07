@@ -31,7 +31,7 @@ window.aye = (function () {
                 },
                 valueOf: function () {
                     if (pending) {
-                        throw new Error("Promise hasn't been resolved yet");
+                        return this;
                     }
                     return result;
                 },

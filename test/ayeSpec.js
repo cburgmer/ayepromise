@@ -1,4 +1,4 @@
-describe("aye", function () {
+describe(libraryName, function () {
     describe("defer", function () {
         it("should indicate a pending promise", function () {
             var defer = aye.defer();
@@ -22,10 +22,10 @@ describe("aye", function () {
             expect(defer.promise.valueOf()).toEqual("21");
         });
 
-        it("should throw an error if the promise hasn't been resolved yet", function () {
+        it("should return the promise itself as result if the promise hasn't been resolved yet", function () {
             var defer = aye.defer();
 
-            expect(function () { defer.promise.valueOf() }).toThrow(new Error("Promise hasn't been resolved yet"));
+            expect(defer.promise.valueOf()).toBe(defer.promise);
         });
 
         it("should execute a given function once resolved", function () {
