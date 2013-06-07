@@ -4,8 +4,7 @@ window.aye = (function () {
     var isPromiseLike = function (obj) {
         return typeof obj === "object"
             && typeof obj.isPending === "function"
-            && typeof obj.then === "function"
-            && typeof obj.valueOf === "function";
+            && typeof obj.then === "function";
     };
 
     var callChainLink = function (func) {
@@ -15,8 +14,8 @@ window.aye = (function () {
             call: function (value) {
                 var returnValue = func(value);
                 if (isPromiseLike(returnValue) && returnValue.isPending()) {
-                    returnValue.then(function () {
-                        defer.resolve(returnValue.valueOf());
+                    returnValue.then(function (result) {
+                        defer.resolve(result);
                     });
                 } else {
                     defer.resolve(returnValue);

@@ -194,5 +194,27 @@ describe(libraryName, function () {
                 expect(yetAnotherSpy).toHaveBeenCalled();
             });
         });
+
+        it("should pass the result from a promise on to the next function in a call chain", function () {
+            var defer = aye.defer(),
+                secondDefer = aye.defer(),
+                spy = jasmine.createSpy("call me").andReturn(secondDefer.promise),
+                yetAnotherSpy = jasmine.createSpy("call me after the other spy");
+
+            defer.promise
+                .then(spy)
+                .then(yetAnotherSpy);
+
+            defer.resolve();
+            secondDefer.resolve("hey there");
+
+            waitsFor(function () {
+                return yetAnotherSpy.wasCalled;
+            });
+
+            runs(function () {
+                expect(yetAnotherSpy).toHaveBeenCalledWith("hey there");
+            });
+        });
     });
 });
