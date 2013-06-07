@@ -1,12 +1,26 @@
 window.aye = (function () {
     var aye = {};
 
+    var isPromiseLike = function (obj) {
+        return typeof obj === "object"
+            && typeof obj.isPending === "function"
+            && typeof obj.then === "function"
+            && typeof obj.valueOf === "function";
+    };
+
     var callChainLink = function (func) {
         var defer = aye.defer();
         return {
             promise: defer.promise,
             call: function (value) {
-                defer.resolve(func(value));
+                var returnValue = func(value);
+                if (isPromiseLike(returnValue) && returnValue.isPending()) {
+                    returnValue.then(function () {
+                        defer.resolve(returnValue.valueOf());
+                    });
+                } else {
+                    defer.resolve(returnValue);
+                }
             }
         }
     };

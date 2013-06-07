@@ -141,7 +141,7 @@ describe(libraryName, function () {
             });
         });
 
-        it("should pass the result of one call as argument to the following, also for a already resolved promise", function () {
+        it("should pass the result of one call as argument to the following, also for an already resolved promise", function () {
             var defer = aye.defer(),
                 spy = jasmine.createSpy("call me").andReturn(42),
                 yetAnotherSpy = jasmine.createSpy("call me after the other spy finished");
@@ -158,6 +158,40 @@ describe(libraryName, function () {
 
             runs(function () {
                 expect(yetAnotherSpy).toHaveBeenCalledWith(42);
+            });
+        });
+
+        it("should only call the next link in the call chain when a returned promise has been resolved", function () {
+            var defer = aye.defer(),
+                secondDefer = aye.defer(),
+                spy = jasmine.createSpy("call me").andReturn(secondDefer.promise),
+                yetAnotherSpy = jasmine.createSpy("call me after the other spy");
+
+            defer.promise
+                .then(spy)
+                .then(yetAnotherSpy);
+
+            defer.resolve();
+
+            waitsFor(function () {
+                return spy.wasCalled;
+            });
+
+            runs(function () {
+                expect(spy).toHaveBeenCalled();
+                expect(yetAnotherSpy).not.toHaveBeenCalled();
+            });
+
+            runs(function () {
+                secondDefer.resolve();
+            });
+
+            waitsFor(function () {
+                return yetAnotherSpy.wasCalled;
+            });
+
+            runs(function () {
+                expect(yetAnotherSpy).toHaveBeenCalled();
             });
         });
     });
