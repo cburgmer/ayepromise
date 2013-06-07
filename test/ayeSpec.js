@@ -38,7 +38,13 @@ describe("aye", function () {
 
             defer.resolve();
 
-            expect(spy).toHaveBeenCalled();
+            waitsFor(function () {
+                return spy.wasCalled;
+            });
+
+            runs(function () {
+                expect(spy).toHaveBeenCalled();
+            });
         });
 
         it("should pass the result to the callback", function () {
@@ -49,7 +55,13 @@ describe("aye", function () {
 
             defer.resolve("half the truth");
 
-            expect(spy).toHaveBeenCalledWith("half the truth");
+            waitsFor(function () {
+                return spy.wasCalled;
+            });
+
+            runs(function () {
+                expect(spy).toHaveBeenCalledWith("half the truth");
+            });
         });
 
         it("should trigger the callback even when passed after the promise has been resolved", function () {
@@ -59,7 +71,13 @@ describe("aye", function () {
             defer.resolve();
             defer.promise.then(spy);
 
-            expect(spy).toHaveBeenCalled();
+            waitsFor(function () {
+                return spy.wasCalled;
+            });
+
+            runs(function () {
+                expect(spy).toHaveBeenCalled();
+            });
         });
 
         it("should handle multiple callbacks", function () {
@@ -72,8 +90,14 @@ describe("aye", function () {
 
             defer.resolve();
 
-            expect(spy).toHaveBeenCalled();
-            expect(yetAnotherSpy).toHaveBeenCalled();
+            waitsFor(function () {
+                return spy.wasCalled;
+            });
+
+            runs(function () {
+                expect(spy).toHaveBeenCalled();
+                expect(yetAnotherSpy).toHaveBeenCalled();
+            });
         });
 
         it("should allow pipelining", function () {
@@ -87,8 +111,14 @@ describe("aye", function () {
 
             defer.resolve();
 
-            expect(spy).toHaveBeenCalled();
-            expect(yetAnotherSpy).toHaveBeenCalled();
+            waitsFor(function () {
+                return spy.wasCalled;
+            });
+
+            runs(function () {
+                expect(spy).toHaveBeenCalled();
+                expect(yetAnotherSpy).toHaveBeenCalled();
+            });
         });
 
         it("should pass the result of one call as argument to the following", function () {
@@ -102,7 +132,13 @@ describe("aye", function () {
 
             defer.resolve();
 
-            expect(yetAnotherSpy).toHaveBeenCalledWith(42);
+            waitsFor(function () {
+                return yetAnotherSpy.wasCalled;
+            });
+
+            runs(function () {
+                expect(yetAnotherSpy).toHaveBeenCalledWith(42);
+            });
         });
 
         it("should pass the result of one call as argument to the following, also for a already resolved promise", function () {
@@ -116,7 +152,13 @@ describe("aye", function () {
                 .then(spy)
                 .then(yetAnotherSpy);
 
-            expect(yetAnotherSpy).toHaveBeenCalledWith(42);
+            waitsFor(function () {
+                return yetAnotherSpy.wasCalled;
+            });
+
+            runs(function () {
+                expect(yetAnotherSpy).toHaveBeenCalledWith(42);
+            });
         });
     });
 });
