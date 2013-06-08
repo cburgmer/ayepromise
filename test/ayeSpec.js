@@ -240,7 +240,7 @@ describe(libraryName, function () {
         });
 
         describe("error handling", function () {
-            it("should resolve promise on reject", function () {
+            it("should resolve a promise on reject", function () {
                 var defer = aye.defer();
 
                 defer.reject();
@@ -249,11 +249,12 @@ describe(libraryName, function () {
             });
 
             it("should return the error", function () {
-                var defer = aye.defer();
+                var defer = aye.defer(),
+                    error = new Error(21);
 
-                defer.reject(21);
+                defer.reject(error);
 
-                expect(defer.promise.valueOf().exception).toBe(21);
+                expect(defer.promise.valueOf().exception).toBe(error);
             });
 
             it("should execute a fail callback", function () {
