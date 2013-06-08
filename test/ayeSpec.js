@@ -320,6 +320,48 @@ describe(libraryName, function () {
                     expect(spy).not.toHaveBeenCalled();
                 });
             });
+
+            it("should handle multiple fail callbacks", function () {
+                var defer = aye.defer(),
+                    spy = jasmine.createSpy("call me"),
+                    yetAnotherSpy = jasmine.createSpy("call me too");
+
+                defer.promise.fail(spy);
+                defer.promise.fail(yetAnotherSpy);
+
+                defer.reject();
+
+                waitsFor(function () {
+                    return spy.wasCalled;
+                });
+
+                runs(function () {
+                    expect(spy).toHaveBeenCalled();
+                    expect(yetAnotherSpy).toHaveBeenCalled();
+                });
+            });
+
+            it("should allow pipelining with a fail callback", function () {
+                var defer = aye.defer(),
+                    spy = jasmine.createSpy("call me"),
+                    yetAnotherSpy = jasmine.createSpy("call me after the other spy finished"),
+                    followingPromise;
+
+                followingPromise = defer.promise.fail(spy);
+                followingPromise.then(yetAnotherSpy);
+
+                defer.reject();
+
+                waitsFor(function () {
+                    return yetAnotherSpy.wasCalled;
+                });
+
+                runs(function () {
+                    expect(spy).toHaveBeenCalled();
+                    expect(yetAnotherSpy).toHaveBeenCalled();
+                });
+            });
+
         });
     });
 });

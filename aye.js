@@ -28,8 +28,8 @@ window.aye = (function () {
         var pending = true,
             fulfilled,
             result = null,
-            downstreamLinks = [],
-            failCallback;
+            thenCallbacks = [],
+            failCallbacks = [];
 
         return {
             resolve: function (value) {
@@ -37,7 +37,7 @@ window.aye = (function () {
                 fulfilled = true;
                 result = value;
 
-                downstreamLinks.forEach(function (link) {
+                thenCallbacks.forEach(function (link) {
                     link.call(result);
                 });
             },
@@ -48,9 +48,9 @@ window.aye = (function () {
                     exception: value
                 }
 
-                if (failCallback) {
-                    failCallback(value);
-                }
+                failCallbacks.forEach(function (link) {
+                    link.call(value);
+                });
             },
             promise: {
                 isPending: function () {
@@ -65,7 +65,7 @@ window.aye = (function () {
                 then: function (callback) {
                     var link = callChainLink(callback);
 
-                    downstreamLinks.push(link);
+                    thenCallbacks.push(link);
 
                     if (!pending && fulfilled) {
                         link.call(result);
@@ -73,11 +73,14 @@ window.aye = (function () {
                     return link.promise;
                 },
                 fail: function (callback) {
-                    failCallback = callback;
+                    var link = callChainLink(callback);
+
+                    failCallbacks.push(link);
 
                     if (!pending && !fulfilled) {
-                        failCallback(result);
+                        link.call(result);
                     }
+                    return link.promise;
                 }
             }
         };
