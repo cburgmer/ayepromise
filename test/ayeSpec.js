@@ -217,6 +217,28 @@ describe(libraryName, function () {
             });
         });
 
+        it("should call the next link in the call chain with a returned, resolved promise", function () {
+            var defer = aye.defer(),
+                secondDefer = aye.defer(),
+                spy = jasmine.createSpy("call me").andReturn(secondDefer.promise),
+                yetAnotherSpy = jasmine.createSpy("call me after the other spy");
+
+            defer.promise
+                .then(spy)
+                .then(yetAnotherSpy);
+
+            secondDefer.resolve("99");
+            defer.resolve();
+
+            waitsFor(function () {
+                return yetAnotherSpy.wasCalled;
+            });
+
+            runs(function () {
+                expect(yetAnotherSpy).toHaveBeenCalledWith("99");
+            });
+        });
+
         describe("error handling", function () {
             it("should resolve promise on reject", function () {
                 var defer = aye.defer();

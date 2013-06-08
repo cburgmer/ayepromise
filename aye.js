@@ -13,7 +13,7 @@ window.aye = (function () {
             promise: defer.promise,
             call: function (value) {
                 var returnValue = func(value);
-                if (isPromiseLike(returnValue) && returnValue.isPending()) {
+                if (isPromiseLike(returnValue)) {
                     returnValue.then(function (result) {
                         defer.resolve(result);
                     });
