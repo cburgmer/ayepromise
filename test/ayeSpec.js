@@ -385,6 +385,91 @@ describe(libraryName, function () {
                 });
             });
 
+            it("should trigger a fail callback in a chain on a raised exception", function () {
+                var defer = aye.defer(),
+                    error = new Error("meh")
+                    spy = jasmine.createSpy("call me").andThrow(error),
+                    failSpy = jasmine.createSpy("failed");
+
+                defer.promise
+                    .then(spy)
+                    .fail(failSpy);
+
+                defer.resolve();
+
+                waitsFor(function () {
+                    return failSpy.wasCalled;
+                });
+
+                runs(function () {
+                    expect(failSpy).toHaveBeenCalledWith(error);
+                });
+            });
+
+            it("should not trigger the call chain on a raised exception", function () {
+                var defer = aye.defer(),
+                    spy = jasmine.createSpy("call me").andThrow(new Error()),
+                    anotherSpy = jasmine.createSpy("another spy");
+
+                defer.promise
+                    .then(spy)
+                    .then(anotherSpy);
+
+                defer.resolve();
+
+                waitsFor(function () {
+                    return spy.wasCalled;
+                });
+
+                runs(function () {
+                    expect(anotherSpy).not.toHaveBeenCalled();
+                });
+            });
+
+            it("should trigger a fail callback in a chain on a failed promise", function () {
+                var defer = aye.defer(),
+                    secondDefer = aye.defer(),
+                    error = new Error("meh"),
+                    spy = jasmine.createSpy("call me").andReturn(secondDefer.promise),
+                    failSpy = jasmine.createSpy("failed");
+
+                defer.promise
+                    .then(spy)
+                    .fail(failSpy);
+
+                defer.resolve();
+                secondDefer.reject(error);
+
+                waitsFor(function () {
+                    return failSpy.wasCalled;
+                });
+
+                runs(function () {
+                    expect(failSpy).toHaveBeenCalledWith(error);
+                });
+            });
+
+            it("should not trigger a then callback in a chain on a failed promise", function () {
+                var defer = aye.defer(),
+                    secondDefer = aye.defer(),
+                    spy = jasmine.createSpy("call me").andReturn(secondDefer.promise),
+                    anotherSpy = jasmine.createSpy("another spy");
+
+                defer.promise
+                    .then(spy)
+                    .then(anotherSpy)
+
+                defer.resolve();
+                secondDefer.reject(new Error());
+
+                waitsFor(function () {
+                    return spy.wasCalled;
+                });
+
+                runs(function () {
+                    expect(anotherSpy).not.toHaveBeenCalled();
+                });
+            });
         });
     });
 });
