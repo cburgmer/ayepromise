@@ -493,6 +493,25 @@ describe(libraryName, function () {
                     expect(failSpy).toHaveBeenCalledWith(error);
                 });
             });
+
+            it("should handle a call chain appended after a fail handler", function () {
+                var defer = aye.defer(),
+                    thenSpy = jasmine.createSpy("a spy"),
+                    failSpy = jasmine.createSpy("fail spy");
+
+                defer.promise
+                    .fail(failSpy)
+                    .then(thenSpy);
+                defer.resolve();
+
+                waitsFor(function () {
+                    return thenSpy.wasCalled;
+                });
+
+                runs(function () {
+                    expect(thenSpy).toHaveBeenCalled();
+                });
+            });
         });
     });
 });

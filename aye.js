@@ -34,6 +34,8 @@ window.aye = (function () {
             callFulfilled: function (value) {
                 if (onFulfilled) {
                     doChainCall(defer, onFulfilled, value);
+                } else {
+                    defer.resolve()
                 }
             },
             callRejected: function (value) {
