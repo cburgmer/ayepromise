@@ -470,6 +470,29 @@ describe(libraryName, function () {
                     expect(anotherSpy).not.toHaveBeenCalled();
                 });
             });
+
+            it("should handle a 'catch-all' fail at the end of a call chain", function () {
+                var defer = aye.defer(),
+                    error = new Error("oopsie"),
+                    errorSpy = jasmine.createSpy("error spy").andThrow(error),
+                    anotherSpy = jasmine.createSpy("another spy"),
+                    failSpy = jasmine.createSpy("fail spy");
+
+                defer.promise
+                    .then(errorSpy)
+                    .then(anotherSpy)
+                    .fail(failSpy);
+
+                defer.resolve();
+
+                waitsFor(function () {
+                    return failSpy.wasCalled;
+                });
+
+                runs(function () {
+                    expect(failSpy).toHaveBeenCalledWith(error);
+                });
+            });
         });
     });
 });

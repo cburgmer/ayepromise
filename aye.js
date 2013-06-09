@@ -8,26 +8,39 @@ window.aye = (function () {
             && typeof obj.fail === "function";
     };
 
-    var callChainLink = function (func) {
+    var doChainCall = function (defer, func, value) {
+        try {
+            var returnValue = func(value);
+        } catch (e) {
+            defer.reject(e);
+            return;
+        }
+        if (isPromiseLike(returnValue)) {
+            returnValue.then(function (result) {
+                defer.resolve(result);
+            });
+            returnValue.fail(function (result) {
+                defer.reject(result);
+            });
+        } else {
+            defer.resolve(returnValue);
+        }
+    };
+
+    var callChainLink = function (onFulfilled, onRejected) {
         var defer = aye.defer();
         return {
             promise: defer.promise,
-            call: function (value) {
-                try {
-                    var returnValue = func(value);
-                } catch (e) {
-                    defer.reject(e);
-                    return;
+            callFulfilled: function (value) {
+                if (onFulfilled) {
+                    doChainCall(defer, onFulfilled, value);
                 }
-                if (isPromiseLike(returnValue)) {
-                    returnValue.then(function (result) {
-                        defer.resolve(result);
-                    });
-                    returnValue.fail(function (result) {
-                        defer.reject(result);
-                    });
+            },
+            callRejected: function (value) {
+                if (onRejected) {
+                    doChainCall(defer, onRejected, value);
                 } else {
-                    defer.resolve(returnValue);
+                    defer.reject(value);
                 }
             }
         }
@@ -37,8 +50,7 @@ window.aye = (function () {
         var pending = true,
             fulfilled,
             result = null,
-            thenCallbacks = [],
-            failCallbacks = [];
+            callbacks = [];
 
         return {
             resolve: function (value) {
@@ -46,8 +58,8 @@ window.aye = (function () {
                 fulfilled = true;
                 result = value;
 
-                thenCallbacks.forEach(function (link) {
-                    link.call(result);
+                callbacks.forEach(function (link) {
+                    link.callFulfilled(result);
                 });
             },
             reject: function (value) {
@@ -57,8 +69,8 @@ window.aye = (function () {
                     exception: value
                 }
 
-                failCallbacks.forEach(function (link) {
-                    link.call(value);
+                callbacks.forEach(function (link) {
+                    link.callRejected(value);
                 });
             },
             promise: {
@@ -74,20 +86,20 @@ window.aye = (function () {
                 then: function (callback) {
                     var link = callChainLink(callback);
 
-                    thenCallbacks.push(link);
+                    callbacks.push(link);
 
                     if (!pending && fulfilled) {
-                        link.call(result);
+                        link.callFulfilled(result);
                     }
                     return link.promise;
                 },
                 fail: function (callback) {
-                    var link = callChainLink(callback);
+                    var link = callChainLink(null, callback);
 
-                    failCallbacks.push(link);
+                    callbacks.push(link);
 
                     if (!pending && !fulfilled) {
-                        link.call(result);
+                        link.callRejected(result);
                     }
                     return link.promise;
                 }
