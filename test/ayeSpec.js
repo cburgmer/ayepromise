@@ -553,10 +553,6 @@ describe(libraryName, function () {
                 error = new Error("noes"),
                 spy = jasmine.createSpy("call me");
 
-            spyOn(secondDefer.promise, 'then').andCallThrough();
-            spyOn(secondDefer.promise, 'isPending').andCallThrough();
-            spyOn(secondDefer.promise, 'valueOf').andCallThrough();
-
             defer.promise.fail(spy);
             defer.resolve(secondDefer.promise);
 
@@ -575,6 +571,23 @@ describe(libraryName, function () {
 
             runs(function () {
                 expect(spy).toHaveBeenCalledWith(error);
+            });
+        });
+
+        it("should reject immediately even when given a promise", function () {
+            var defer = aye.defer(),
+                secondDefer = aye.defer(),
+                spy = jasmine.createSpy("call me");
+
+            defer.promise.fail(spy);
+            defer.reject(secondDefer.promise);
+
+            waitsFor(function () {
+                return spy.wasCalled;
+            });
+
+            runs(function () {
+                expect(spy).toHaveBeenCalledWith(secondDefer.promise);
             });
         });
     });
