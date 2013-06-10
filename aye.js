@@ -9,22 +9,14 @@ window.aye = (function () {
     };
 
     var doChainCall = function (defer, func, value) {
+        var returnValue;
         try {
-            var returnValue = func(value);
+            returnValue = func(value);
         } catch (e) {
             defer.reject(e);
             return;
         }
-        if (isPromiseLike(returnValue)) {
-            returnValue.then(function (result) {
-                defer.resolve(result);
-            });
-            returnValue.fail(function (result) {
-                defer.reject(result);
-            });
-        } else {
-            defer.resolve(returnValue);
-        }
+        defer.resolve(returnValue);
     };
 
     var callChainLink = function (onFulfilled, onRejected) {
