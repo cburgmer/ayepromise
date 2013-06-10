@@ -239,6 +239,66 @@ describe(libraryName, function () {
             });
         });
 
+        it("should trigger only when the promised passed to resolve has been resolved", function () {
+            var defer = aye.defer(),
+                secondDefer = aye.defer(),
+                spy = jasmine.createSpy("call me");
+
+            spyOn(secondDefer.promise, 'then').andCallThrough();
+            spyOn(secondDefer.promise, 'isPending').andCallThrough();
+            spyOn(secondDefer.promise, 'valueOf').andCallThrough();
+
+            defer.promise.then(spy);
+            defer.resolve(secondDefer.promise);
+
+            waits(10);
+
+            runs(function () {
+                expect(spy).not.toHaveBeenCalled();
+
+                secondDefer.resolve("yay");
+            });
+
+            waitsFor(function () {
+                return spy.wasCalled;
+            });
+
+            runs(function () {
+                expect(spy).toHaveBeenCalledWith("yay");
+            });
+        });
+
+        it("should trigger fail callback when the promised passed to resolve has been rejected", function () {
+            var defer = aye.defer(),
+                secondDefer = aye.defer(),
+                error = new Error("noes"),
+                spy = jasmine.createSpy("call me");
+
+            spyOn(secondDefer.promise, 'then').andCallThrough();
+            spyOn(secondDefer.promise, 'isPending').andCallThrough();
+            spyOn(secondDefer.promise, 'valueOf').andCallThrough();
+
+            defer.promise.fail(spy);
+            defer.resolve(secondDefer.promise);
+
+            // Didn't know a better way to wait for Q triggering its internals
+            waits(10);
+
+            runs(function () {
+                expect(spy).not.toHaveBeenCalled();
+
+                secondDefer.reject(error);
+            });
+
+            waitsFor(function () {
+                return spy.wasCalled;
+            });
+
+            runs(function () {
+                expect(spy).toHaveBeenCalledWith(error);
+            });
+        });
+
         describe("error handling", function () {
             it("should resolve a promise on reject", function () {
                 var defer = aye.defer();

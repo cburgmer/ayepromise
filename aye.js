@@ -54,26 +54,43 @@ window.aye = (function () {
             result = null,
             callbacks = [];
 
+        var doFulfill = function (value) {
+            pending = false;
+            fulfilled = true;
+            result = value;
+
+            callbacks.forEach(function (link) {
+                link.callFulfilled(value);
+            });
+        };
+
+        var doReject = function (value) {
+            pending = false;
+            fulfilled = false;
+            result = {
+                exception: value
+            }
+
+            callbacks.forEach(function (link) {
+                link.callRejected(value);
+            });
+        };
+
         return {
             resolve: function (value) {
-                pending = false;
-                fulfilled = true;
-                result = value;
-
-                callbacks.forEach(function (link) {
-                    link.callFulfilled(result);
-                });
+                if (isPromiseLike(value)) {
+                    value.then(function (theResult) {
+                        doFulfill(theResult);
+                    });
+                    value.fail(function (theResult) {
+                        doReject(theResult);
+                    });
+                } else {
+                    doFulfill(value);
+                }
             },
             reject: function (value) {
-                pending = false;
-                fulfilled = false;
-                result = {
-                    exception: value
-                }
-
-                callbacks.forEach(function (link) {
-                    link.callRejected(value);
-                });
+                doReject(value);
             },
             promise: {
                 isPending: function () {
