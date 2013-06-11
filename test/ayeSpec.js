@@ -27,6 +27,12 @@ describe(libraryName, function () {
 
             expect(defer.promise.valueOf()).toBe(defer.promise);
         });
+
+        it("should resolve 'null'", function () {
+            var defer = aye.defer();
+
+            defer.resolve(null);
+        });
     });
 
     describe("on fulfill callback", function () {

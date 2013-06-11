@@ -2,7 +2,8 @@ window.aye = (function () {
     var aye = {};
 
     var isPromiseLike = function (obj) {
-        return typeof obj === "object"
+        return obj !== null
+            && typeof obj === "object"
             && typeof obj.isPending === "function"
             && typeof obj.then === "function";
     };
