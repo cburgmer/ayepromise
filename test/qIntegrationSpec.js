@@ -1,4 +1,4 @@
 var specs = specs || require('./specs.js'),
-    Q = Q || require('Q');
+    Q = Q || require('q');
 
-specs(Q, "Q");
+specs(Q, "q");
