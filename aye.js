@@ -1,4 +1,10 @@
-window.aye = (function () {
+(function (definition) {
+    if (typeof module !== 'undefined') {
+        module.exports = definition();
+    } else {
+        this.aye = definition();
+    }
+})(function () {
     var aye = {};
 
     var isPromiseLike = function (obj) {
@@ -117,4 +123,4 @@ window.aye = (function () {
     };
 
     return aye;
-}());
+});

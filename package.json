@@ -1,0 +1,28 @@
+{
+    "name": "aye",
+    "main": "./aye.js",
+    "description": "A teeny-tiny promise library",
+    "homepage": "http://github.com/cburgmer/aye",
+    "author": "Christoph Burgmer <christoph.burgmer@gmail.com>",
+    "keywords": [
+        "q",
+        "promise",
+        "promises",
+        "promises-a",
+        "promises-aplus",
+        "deferred",
+        "future",
+        "async",
+        "flow control",
+        "browser",
+        "node"
+    ],
+    "devDependencies": {
+        "jasmine-node": ">=1.0.20",
+        "q": ">=0.9.5"
+    },
+    "version": "0.0.1",
+    "scripts": {
+        "test": "cd test; jasmine-node --verbose ."
+    }
+}

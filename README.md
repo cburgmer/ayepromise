@@ -45,4 +45,10 @@ Install
 Run the test suite
 ------------------
 
-First install dependencies via ```bower install```. Point your browser to ```test/SpecRunner.html``` and ```test/CompatibilitySpecRunner.html```.
+* Browser:
+
+    First install dependencies via ```bower install```. Point your browser to ```test/SpecRunner.html``` and ```test/CompatibilitySpecRunner.html```.
+
+* Node:
+
+    Install dependencies via ```npm install``` and run ```npm test```.
