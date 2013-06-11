@@ -21,7 +21,7 @@
         "jasmine-node": ">=1.0.20",
         "q": ">=0.9.5"
     },
-    "version": "0.0.1",
+    "version": "0.0.2",
     "scripts": {
         "test": "cd test; jasmine-node --verbose ."
     }
