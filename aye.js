@@ -4,8 +4,7 @@ window.aye = (function () {
     var isPromiseLike = function (obj) {
         return typeof obj === "object"
             && typeof obj.isPending === "function"
-            && typeof obj.then === "function"
-            && typeof obj.fail === "function";
+            && typeof obj.then === "function";
     };
 
     var doChainCall = function (defer, func, value) {
@@ -88,8 +87,7 @@ window.aye = (function () {
                 if (isPromiseLike(value)) {
                     value.then(function (theResult) {
                         doFulfill(theResult);
-                    });
-                    value.fail(function (theResult) {
+                    }, function (theResult) {
                         doReject(theResult);
                     });
                 } else {
