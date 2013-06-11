@@ -295,7 +295,7 @@ describe(libraryName, function () {
             var defer = aye.defer(),
                 spy = jasmine.createSpy("fail callback");
 
-            defer.promise.fail(spy);
+            defer.promise.then(null, spy);
 
             defer.reject();
 
@@ -313,7 +313,7 @@ describe(libraryName, function () {
                 spy = jasmine.createSpy("call me"),
                 error = new Error("didn't work out, sorry");
 
-            defer.promise.fail(spy);
+            defer.promise.then(null, spy);
 
             defer.reject(error);
 
@@ -331,7 +331,7 @@ describe(libraryName, function () {
                 spy = jasmine.createSpy("call me");
 
             defer.reject();
-            defer.promise.fail(spy);
+            defer.promise.then(null, spy);
 
             waitsFor(function () {
                 return spy.wasCalled;
@@ -348,8 +348,7 @@ describe(libraryName, function () {
                 successSpy = jasmine.createSpy("call me");
 
             defer.resolve();
-            defer.promise.then(successSpy)
-            defer.promise.fail(spy);
+            defer.promise.then(successSpy, spy);
 
             waitsFor(function () {
                 return successSpy.wasCalled;
@@ -366,8 +365,7 @@ describe(libraryName, function () {
                 failSpy = jasmine.createSpy("call me");
 
             defer.reject();
-            defer.promise.then(spy)
-            defer.promise.fail(failSpy);
+            defer.promise.then(spy, failSpy);
 
             waitsFor(function () {
                 return failSpy.wasCalled;
@@ -383,8 +381,8 @@ describe(libraryName, function () {
                 spy = jasmine.createSpy("call me"),
                 yetAnotherSpy = jasmine.createSpy("call me too");
 
-            defer.promise.fail(spy);
-            defer.promise.fail(yetAnotherSpy);
+            defer.promise.then(null, spy);
+            defer.promise.then(null, yetAnotherSpy);
 
             defer.reject();
 
@@ -404,7 +402,7 @@ describe(libraryName, function () {
                 yetAnotherSpy = jasmine.createSpy("call me after the other spy finished"),
                 followingPromise;
 
-            followingPromise = defer.promise.fail(spy);
+            followingPromise = defer.promise.then(null, spy);
             followingPromise.then(yetAnotherSpy);
 
             defer.reject();
@@ -427,7 +425,7 @@ describe(libraryName, function () {
 
             defer.promise
                 .then(spy)
-                .fail(failSpy);
+                .then(null, failSpy);
 
             defer.resolve();
 
@@ -469,7 +467,7 @@ describe(libraryName, function () {
 
             defer.promise
                 .then(spy)
-                .fail(failSpy);
+                .then(null, failSpy);
 
             defer.resolve();
             secondDefer.reject(error);
@@ -515,7 +513,7 @@ describe(libraryName, function () {
             defer.promise
                 .then(errorSpy)
                 .then(anotherSpy)
-                .fail(failSpy);
+                .then(null, failSpy);
 
             defer.resolve();
 
@@ -534,7 +532,7 @@ describe(libraryName, function () {
                 failSpy = jasmine.createSpy("fail spy");
 
             defer.promise
-                .fail(failSpy)
+                .then(null, failSpy)
                 .then(thenSpy);
             defer.resolve();
 
@@ -553,7 +551,7 @@ describe(libraryName, function () {
                 error = new Error("noes"),
                 spy = jasmine.createSpy("call me");
 
-            defer.promise.fail(spy);
+            defer.promise.then(null, spy);
             defer.resolve(secondDefer.promise);
 
             // Didn't know a better way to wait for Q triggering its internals
@@ -579,7 +577,7 @@ describe(libraryName, function () {
                 secondDefer = aye.defer(),
                 spy = jasmine.createSpy("call me");
 
-            defer.promise.fail(spy);
+            defer.promise.then(null, spy);
             defer.reject(secondDefer.promise);
 
             waitsFor(function () {
@@ -588,6 +586,26 @@ describe(libraryName, function () {
 
             runs(function () {
                 expect(spy).toHaveBeenCalledWith(secondDefer.promise);
+            });
+        });
+    });
+
+    describe("fail shorthand", function () {
+        it("should act as a shorthand to then", function () {
+            var defer = aye.defer(),
+                error = new Error("fail"),
+                spy = jasmine.createSpy("call me");
+
+            defer.promise.fail(spy);
+
+            defer.reject(error);
+
+            waitsFor(function () {
+                return spy.wasCalled;
+            });
+
+            runs(function () {
+                expect(spy).toHaveBeenCalledWith(error);
             });
         });
     });

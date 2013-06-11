@@ -68,6 +68,21 @@ window.aye = (function () {
             });
         };
 
+        var registerResultHandler = function (onFulfilled, onRejected) {
+            var link = callChainLink(onFulfilled, onRejected);
+
+            callbacks.push(link);
+
+            if (!pending) {
+                if (fulfilled) {
+                    link.callFulfilled(result);
+                } else {
+                    link.callRejected(result);
+                }
+            }
+            return link.promise;
+        };
+
         return {
             resolve: function (value) {
                 if (isPromiseLike(value)) {
@@ -94,25 +109,9 @@ window.aye = (function () {
                     }
                     return result;
                 },
-                then: function (callback) {
-                    var link = callChainLink(callback);
-
-                    callbacks.push(link);
-
-                    if (!pending && fulfilled) {
-                        link.callFulfilled(result);
-                    }
-                    return link.promise;
-                },
-                fail: function (callback) {
-                    var link = callChainLink(null, callback);
-
-                    callbacks.push(link);
-
-                    if (!pending && !fulfilled) {
-                        link.callRejected(result);
-                    }
-                    return link.promise;
+                then: registerResultHandler,
+                fail: function (onRejected) {
+                    return registerResultHandler(null, onRejected);
                 }
             }
         };
