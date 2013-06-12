@@ -19,7 +19,8 @@
     ],
     "devDependencies": {
         "jasmine-node": ">=1.0.20",
-        "q": ">=0.9.5"
+        "q": ">=0.9.5",
+        "promises-aplus-tests": "*"
     },
     "version": "0.0.2",
     "scripts": {
