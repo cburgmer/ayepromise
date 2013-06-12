@@ -341,9 +341,10 @@
 
             it("should trigger the fail callback even when passed after the promise has been resolved", function () {
                 var defer = subject.defer(),
-                    spy = jasmine.createSpy("call me");
+                    spy = jasmine.createSpy("call me").andReturn(error),
+                    error = new Error("didn't work out, sorry");
 
-                defer.reject();
+                defer.reject(error);
                 defer.promise.then(null, spy);
 
                 waitsFor(function () {
@@ -351,7 +352,7 @@
                 });
 
                 runs(function () {
-                    expect(spy).toHaveBeenCalled();
+                    expect(spy).toHaveBeenCalledWith(error);
                 });
             });
 

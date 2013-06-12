@@ -49,7 +49,8 @@
     aye.defer = function () {
         var pending = true,
             fulfilled,
-            result = null,
+            result,
+            error,
             callbacks = [];
 
         var doFulfill = function (value) {
@@ -58,19 +59,17 @@
             result = value;
 
             callbacks.forEach(function (link) {
-                link.callFulfilled(value);
+                link.callFulfilled(result);
             });
         };
 
         var doReject = function (value) {
             pending = false;
             fulfilled = false;
-            result = {
-                exception: value
-            }
+            error = value;
 
             callbacks.forEach(function (link) {
-                link.callRejected(value);
+                link.callRejected(error);
             });
         };
 
@@ -83,7 +82,7 @@
                 if (fulfilled) {
                     link.callFulfilled(result);
                 } else {
-                    link.callRejected(result);
+                    link.callRejected(error);
                 }
             }
             return link.promise;
@@ -111,8 +110,13 @@
                 valueOf: function () {
                     if (pending) {
                         return this;
+                    } else if (fulfilled) {
+                        return result;
+                    } else {
+                        return {
+                            exception: error
+                        };
                     }
-                    return result;
                 },
                 then: registerResultHandler,
                 fail: function (onRejected) {
