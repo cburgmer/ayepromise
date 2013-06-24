@@ -6,7 +6,8 @@
     }
 })(function () {
     var helpers = {},
-        subject;
+        subject,
+        timeout = 20;
 
     var alreadyResolved = function (testName, value, test) {
         var done = jasmine.createSpy("done");
@@ -18,7 +19,7 @@
 
             waitsFor(function () {
                 return done.wasCalled;
-            });
+            }, timeout);
         });
     };
 
@@ -32,13 +33,46 @@
 
             waitsFor(function () {
                 return done.wasCalled;
-            });
+            }, timeout);
+        });
+    };
+
+    var alreadyRejected = function (testName, value, test) {
+        var done = jasmine.createSpy("done");
+
+        it(testName + " (already rejected)", function () {
+            var defer = subject.defer();
+            defer.reject(value);
+            test(defer.promise, done);
+
+            waitsFor(function () {
+                return done.wasCalled;
+            }, timeout);
+        });
+    };
+
+    var deferredRejected = function (testName, value, test) {
+        var done = jasmine.createSpy("done");
+
+        it(testName + " (deferred rejected)", function () {
+            var defer = subject.defer();
+            test(defer.promise, done);
+            defer.reject(value);
+
+            waitsFor(function () {
+                return done.wasCalled;
+            }, timeout);
         });
     };
 
     helpers.testFulfilled = function (testName, value, test) {
         alreadyResolved(testName, value, test);
         deferredResolve(testName, value, test);
+    };
+
+    helpers.testRejected = function (testName, value, test) {
+        alreadyRejected(testName, value, test);
+        deferredRejected(testName, value, test);
     };
 
     helpers.setSubject = function (theSubject) {

@@ -244,101 +244,44 @@
         });
 
         describe("on reject callback", function () {
-            it("should execute a fail callback", function () {
-                var defer = subject.defer(),
-                    spy = jasmine.createSpy("fail callback");
-
-                defer.promise.then(null, spy);
-
-                defer.reject();
-
-                waitsFor(function () {
-                    return spy.wasCalled;
-                });
-
-                runs(function () {
-                    expect(spy).toHaveBeenCalled();
+            var error = new Error("didn't work out, sorry")
+            helpers.testRejected("should execute a fail callback", null, function (promise, done) {
+                promise.then(null, function () {
+                    done();
                 });
             });
 
-            it("should pass the error to the fail callback", function () {
-                var defer = subject.defer(),
-                    spy = jasmine.createSpy("call me"),
-                    error = new Error("didn't work out, sorry");
-
-                defer.promise.then(null, spy);
-
-                defer.reject(error);
-
-                waitsFor(function () {
-                    return spy.wasCalled;
-                });
-
-                runs(function () {
-                    expect(spy).toHaveBeenCalledWith(error);
+            helpers.testRejected("should pass the error to the fail callback", error, function (promise, done) {
+                promise.then(null, function (value) {
+                    expect(value).toBe(error);
+                    done();
                 });
             });
 
-            it("should trigger the fail callback even when passed after the promise has been resolved", function () {
-                var defer = subject.defer(),
-                    spy = jasmine.createSpy("call me").andReturn(error),
-                    error = new Error("didn't work out, sorry");
+            helpers.testFulfilled("should not trigger fail callback passed after promise has been fulfilled", null, function (promise, done) {
+                var spy = jasmine.createSpy("don't call me");
 
-                defer.reject(error);
-                defer.promise.then(null, spy);
-
-                waitsFor(function () {
-                    return spy.wasCalled;
-                });
-
-                runs(function () {
-                    expect(spy).toHaveBeenCalledWith(error);
-                });
-            });
-
-            it("should not trigger fail callback passed after promise has been fulfilled", function () {
-                var defer = subject.defer(),
-                    spy = jasmine.createSpy("don't call me"),
-                    successSpy = jasmine.createSpy("call me");
-
-                defer.resolve();
-                defer.promise.then(successSpy, spy);
-
-                waitsFor(function () {
-                    return successSpy.wasCalled;
-                });
-
-                runs(function () {
+                promise.then(function () {
                     expect(spy).not.toHaveBeenCalled();
-                });
+                    done();
+                }, spy);
             });
 
-            it("should not trigger then callback passed after promise has been rejected", function () {
-                var defer = subject.defer(),
-                    spy = jasmine.createSpy("don't call me"),
-                    failSpy = jasmine.createSpy("call me");
+            helpers.testRejected("should not trigger fulfilled callback passed after promise has been rejected", null, function (promise, done) {
+                var spy = jasmine.createSpy("don't call me");
 
-                defer.reject();
-                defer.promise.then(spy, failSpy);
-
-                waitsFor(function () {
-                    return failSpy.wasCalled;
-                });
-
-                runs(function () {
+                promise.then(spy, function () {
                     expect(spy).not.toHaveBeenCalled();
+                    done();
                 });
             });
 
-            it("should handle multiple fail callbacks", function () {
-                var defer = subject.defer(),
-                    spy = jasmine.createSpy("call me"),
+            helpers.testRejected("should handle multiple fail callbacks", null, function (promise, done) {
+                var spy = jasmine.createSpy("call me"),
                     yetAnotherSpy = jasmine.createSpy("call me too");
 
-                defer.promise.then(null, spy);
-                defer.promise.then(null, yetAnotherSpy);
-
-                defer.reject();
+                promise.then(null, spy);
+                promise.then(null, yetAnotherSpy);
 
                 waitsFor(function () {
                     return spy.wasCalled;
@@ -347,61 +290,41 @@
                 runs(function () {
                     expect(spy).toHaveBeenCalled();
                     expect(yetAnotherSpy).toHaveBeenCalled();
+                    done();
                 });
             });
 
-            it("should allow pipelining with a fail callback", function () {
-                var defer = subject.defer(),
-                    spy = jasmine.createSpy("call me"),
-                    yetAnotherSpy = jasmine.createSpy("call me after the other spy finished"),
+            helpers.testRejected("should allow pipelining with a fail callback", null, function (promise, done) {
+                var spy = jasmine.createSpy("call me"),
                     followingPromise;
 
-                followingPromise = defer.promise.then(null, spy);
-                followingPromise.then(yetAnotherSpy);
-
-                defer.reject();
-
-                waitsFor(function () {
-                    return yetAnotherSpy.wasCalled;
-                });
-
-                runs(function () {
+                followingPromise = promise.then(null, spy);
+                followingPromise.then(function () {
                     expect(spy).toHaveBeenCalled();
-                    expect(yetAnotherSpy).toHaveBeenCalled();
+                    done();
                 });
             });
 
-            it("should trigger a fail callback in a chain on a raised exception", function () {
-                var defer = subject.defer(),
-                    error = new Error("meh")
-                    spy = jasmine.createSpy("call me").andThrow(error),
-                    failSpy = jasmine.createSpy("failed");
+            helpers.testFulfilled("should trigger a fail callback in a chain on a raised exception", null, function (promise, done) {
+                var error = new Error("meh");
 
-                defer.promise
-                    .then(spy)
-                    .then(null, failSpy);
-
-                defer.resolve();
-
-                waitsFor(function () {
-                    return failSpy.wasCalled;
-                });
-
-                runs(function () {
-                    expect(failSpy).toHaveBeenCalledWith(error);
-                });
+                promise
+                    .then(function () {
+                        throw error;
+                    })
+                    .then(null, function (value) {
+                        expect(value).toBe(error);
+                        done();
+                    });
             });
 
-            it("should not trigger the call chain on a raised exception", function () {
-                var defer = subject.defer(),
-                    spy = jasmine.createSpy("call me").andThrow(new Error()),
+            helpers.testFulfilled("should not trigger the call chain on a raised exception", null, function (promise, done) {
+                var spy = jasmine.createSpy("call me").andThrow(new Error()),
                     anotherSpy = jasmine.createSpy("another spy");
 
-                defer.promise
+                promise
                     .then(spy)
                     .then(anotherSpy);
-
-                defer.resolve();
 
                 waitsFor(function () {
                     return spy.wasCalled;
@@ -409,6 +332,7 @@
 
                 runs(function () {
                     expect(anotherSpy).not.toHaveBeenCalled();
+                    done();
                 });
             });
 
