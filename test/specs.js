@@ -66,48 +66,12 @@
                 });
             });
 
-            it("should pass the result to the callback", function () {
-                var defer = subject.defer(),
-                    spy = jasmine.createSpy("call me");
-
-                defer.promise.then(spy);
-
-                defer.resolve("half the truth");
-
-                waitsFor(function () {
-                    return spy.wasCalled;
-                });
-
-                runs(function () {
-                    expect(spy).toHaveBeenCalledWith("half the truth");
-                });
-            });
-
-            it("should trigger the callback even when passed after the promise has been resolved", function () {
-                var defer = subject.defer(),
-                    spy = jasmine.createSpy("call me");
-
-                defer.resolve();
-                defer.promise.then(spy);
-
-                waitsFor(function () {
-                    return spy.wasCalled;
-                });
-
-                runs(function () {
-                    expect(spy).toHaveBeenCalled();
-                });
-            });
-
-            it("should handle multiple callbacks", function () {
-                var defer = subject.defer(),
-                    spy = jasmine.createSpy("call me"),
+            helpers.testFulfilled("should handle multiple callbacks", null, function (promise, done) {
+                var spy = jasmine.createSpy("call me"),
                     yetAnotherSpy = jasmine.createSpy("call me too");
 
-                defer.promise.then(spy);
-                defer.promise.then(yetAnotherSpy);
-
-                defer.resolve();
+                promise.then(spy);
+                promise.then(yetAnotherSpy);
 
                 waitsFor(function () {
                     return spy.wasCalled;
@@ -116,19 +80,18 @@
                 runs(function () {
                     expect(spy).toHaveBeenCalled();
                     expect(yetAnotherSpy).toHaveBeenCalled();
+
+                    done();
                 });
             });
 
-            it("should allow pipelining", function () {
-                var defer = subject.defer(),
-                    spy = jasmine.createSpy("call me"),
+            helpers.testFulfilled("should allow pipelining", null, function (promise, done) {
+                var spy = jasmine.createSpy("call me"),
                     yetAnotherSpy = jasmine.createSpy("call me after the other spy finished"),
                     followingPromise;
 
-                followingPromise = defer.promise.then(spy);
+                followingPromise = promise.then(spy);
                 followingPromise.then(yetAnotherSpy);
-
-                defer.resolve();
 
                 waitsFor(function () {
                     return spy.wasCalled;
@@ -138,46 +101,19 @@
                     expect(spy).toHaveBeenCalled();
                     expect(yetAnotherSpy).toHaveBeenCalled();
                 });
+
+                done();
             });
 
-            it("should pass the result of one call as argument to the following", function () {
-                var defer = subject.defer(),
-                    spy = jasmine.createSpy("call me").andReturn(42),
-                    yetAnotherSpy = jasmine.createSpy("call me after the other spy finished");
-
-                defer.promise
-                    .then(spy)
-                    .then(yetAnotherSpy);
-
-                defer.resolve();
-
-                waitsFor(function () {
-                    return yetAnotherSpy.wasCalled;
-                });
-
-                runs(function () {
-                    expect(yetAnotherSpy).toHaveBeenCalledWith(42);
-                });
-            });
-
-            it("should pass the result of one call as argument to the following, also for an already resolved promise", function () {
-                var defer = subject.defer(),
-                    spy = jasmine.createSpy("call me").andReturn(42),
-                    yetAnotherSpy = jasmine.createSpy("call me after the other spy finished");
-
-                defer.resolve();
-
-                defer.promise
-                    .then(spy)
-                    .then(yetAnotherSpy);
-
-                waitsFor(function () {
-                    return yetAnotherSpy.wasCalled;
-                });
-
-                runs(function () {
-                    expect(yetAnotherSpy).toHaveBeenCalledWith(42);
-                });
+            helpers.testFulfilled("should pass the result of one call as argument to the following", null, function (promise, done) {
+                promise
+                    .then(function () {
+                        return 42;
+                    })
+                    .then(function (value) {
+                        expect(value).toBe(42);
+                        done();
+                    });
             });
 
             it("should only call the next link in the call chain when a returned promise has been resolved", function () {

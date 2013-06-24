@@ -54,6 +54,6 @@ Run the test suite
 
     Install dependencies via ```npm install``` and run ```npm test```.
 
-* Promise/A+ Compliance Test Suite
+* Promise/A+ Compliance Test Suite:
 
-    $ promises-aplus-tests test/complianceTestSuiteAdapter.js
+        $ promises-aplus-tests test/complianceTestSuiteAdapter.js
