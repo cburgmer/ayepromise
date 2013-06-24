@@ -5,6 +5,9 @@
         this.specs = definition;
     }
 })(function (subject, libraryName) {
+    var helpers = this.helpers || require('./helpers.js');
+    helpers.setSubject(subject);
+
     describe(libraryName, function () {
         it("should indicate a pending promise", function () {
             var defer = subject.defer();
@@ -43,22 +46,23 @@
         });
 
         describe("on fulfill callback", function () {
-            it("should execute a given function once resolved", function () {
+            helpers.testFulfilled("should execute a given function when promised is resolved", null, function (promise, done) {
+                promise.then(done);
+            });
+
+            it("should not execute a given function before resolved", function () {
                 var defer = subject.defer(),
                     spy = jasmine.createSpy("call me");
 
                 defer.promise.then(spy);
 
                 expect(spy).not.toHaveBeenCalled();
+            });
 
-                defer.resolve();
-
-                waitsFor(function () {
-                    return spy.wasCalled;
-                });
-
-                runs(function () {
-                    expect(spy).toHaveBeenCalled();
+            helpers.testFulfilled("should pass the result to the callback", "the value", function (promise, done) {
+                promise.then(function (value) {
+                    expect(value).toBe("the value");
+                    done();
                 });
             });
 
