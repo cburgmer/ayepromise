@@ -24,6 +24,6 @@
     },
     "version": "0.0.2",
     "scripts": {
-        "test": "cd test; jasmine-node --verbose ."
+        "test": "cd test; jasmine-node --verbose . && promises-aplus-tests complianceTestSuiteAdapter.js"
     }
 }
