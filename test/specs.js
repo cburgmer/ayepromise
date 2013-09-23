@@ -6,9 +6,13 @@
     }
 })(function (subject, libraryName) {
     var helpers = this.helpers || require('./helpers.js');
-    helpers.setSubject(subject);
 
     describe(libraryName, function () {
+
+        beforeEach(function () {
+            helpers.setSubject(subject);
+        });
+
         it("should indicate a pending promise", function () {
             var defer = subject.defer();
 
