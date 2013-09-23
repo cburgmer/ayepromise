@@ -6,6 +6,8 @@ Aye is a teeny-tiny promise library. It promises to pass the [Promises/A+](http:
 
 Aye tries to be fully compatible with [kriskowal's Q](https://github.com/kriskowal/q) in such a way that you can always replace ```aye``` with ```Q```. It will however not try to implement anything close to the full feature set. Check ```test/CompatibilitySpecRunner.html``` to see Aye's test suite executed against Q.
 
+[![Promises/A+ 1.0 compliant](http://promisesaplus.com/assets/logo-small.png)](http://promisesaplus.com/)
+
 Why?
 ----
 
