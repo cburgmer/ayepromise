@@ -14,14 +14,16 @@
     };
 
     var doChainCall = function (defer, func, value) {
-        var returnValue;
-        try {
-            returnValue = func(value);
-        } catch (e) {
-            defer.reject(e);
-            return;
-        }
-        defer.resolve(returnValue);
+        setTimeout(function () {
+            var returnValue;
+            try {
+                returnValue = func(value);
+            } catch (e) {
+                defer.reject(e);
+                return;
+            }
+            defer.resolve(returnValue);
+        }, 1);
     };
 
     var doFulfillCall = function (defer, onFulfilled, value) {

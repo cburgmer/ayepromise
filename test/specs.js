@@ -241,6 +241,16 @@
                         done();
                     });
             });
+
+            helpers.testFulfilled("should return before calling handler", null, function (promise, done) {
+                var isDone = false;
+                promise
+                    .then(function () {
+                        expect(isDone).toBeTruthy();
+                        done();
+                    });
+                isDone = true;
+            });
        });
 
         describe("reject", function () {
@@ -473,6 +483,16 @@
                         expect(value).toBe(error);
                         done();
                     });
+            });
+
+            helpers.testRejected("should return before calling handler", error, function (promise, done) {
+                var isDone = false;
+                promise
+                    .then(null, function () {
+                        expect(isDone).toBeTruthy();
+                        done();
+                    });
+                isDone = true;
             });
         });
 
