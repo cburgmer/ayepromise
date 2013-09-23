@@ -42,7 +42,7 @@
         }
     };
 
-    var callChainLink = function (onFulfilled, onRejected) {
+    var aCallChainLink = function (onFulfilled, onRejected) {
         var defer = aye.defer();
         return {
             promise: defer.promise,
@@ -58,40 +58,39 @@
     aye.defer = function () {
         var pending = true,
             fulfilled,
-            result,
-            error,
+            outcome,
             callbacks = [];
 
         var doFulfill = function (value) {
             pending = false;
             fulfilled = true;
-            result = value;
+            outcome = value;
 
             callbacks.forEach(function (link) {
-                link.callFulfilled(result);
+                link.callFulfilled(outcome);
             });
         };
 
         var doReject = function (value) {
             pending = false;
             fulfilled = false;
-            error = value;
+            outcome = value;
 
             callbacks.forEach(function (link) {
-                link.callRejected(error);
+                link.callRejected(outcome);
             });
         };
 
         var registerResultHandler = function (onFulfilled, onRejected) {
-            var link = callChainLink(onFulfilled, onRejected);
+            var link = aCallChainLink(onFulfilled, onRejected);
 
             callbacks.push(link);
 
             if (!pending) {
                 if (fulfilled) {
-                    link.callFulfilled(result);
+                    link.callFulfilled(outcome);
                 } else {
-                    link.callRejected(error);
+                    link.callRejected(outcome);
                 }
             }
             return link.promise;
@@ -100,11 +99,7 @@
         return {
             resolve: function (value) {
                 if (isPromiseLike(value)) {
-                    value.then(function (theResult) {
-                        doFulfill(theResult);
-                    }, function (theResult) {
-                        doReject(theResult);
-                    });
+                    value.then(doFulfill, doReject);
                 } else {
                     doFulfill(value);
                 }
@@ -120,10 +115,10 @@
                     if (pending) {
                         return this;
                     } else if (fulfilled) {
-                        return result;
+                        return outcome;
                     } else {
                         return {
-                            exception: error
+                            exception: outcome
                         };
                     }
                 },
