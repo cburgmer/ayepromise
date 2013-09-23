@@ -25,23 +25,31 @@
         defer.resolve(returnValue);
     };
 
+    var doFulfillCall = function (defer, onFulfilled, value) {
+        if (onFulfilled && onFulfilled.call) {
+            doChainCall(defer, onFulfilled, value);
+        } else {
+            defer.resolve(value);
+        }
+    };
+
+    var doRejectCall = function (defer, onRejected, value) {
+        if (onRejected && onRejected.call) {
+            doChainCall(defer, onRejected, value);
+        } else {
+            defer.reject(value);
+        }
+    };
+
     var callChainLink = function (onFulfilled, onRejected) {
         var defer = aye.defer();
         return {
             promise: defer.promise,
             callFulfilled: function (value) {
-                if (onFulfilled) {
-                    doChainCall(defer, onFulfilled, value);
-                } else {
-                    defer.resolve()
-                }
+                doFulfillCall(defer, onFulfilled, value);
             },
             callRejected: function (value) {
-                if (onRejected) {
-                    doChainCall(defer, onRejected, value);
-                } else {
-                    defer.reject(value);
-                }
+                doRejectCall(defer, onRejected, value);
             }
         }
     };

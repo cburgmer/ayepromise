@@ -204,6 +204,30 @@
                     expect(spy).toHaveBeenCalledWith("yay");
                 });
             });
+
+            helpers.testFulfilled("should allow non-functions (an integer) in fulfill handler", "hey there", function (promise, done) {
+                var defer = subject.defer(),
+                    nonFunction = 42;
+
+                promise
+                    .then(nonFunction)
+                    .then(function (value) {
+                        expect(value).toBe("hey there");
+                        done();
+                    });
+            });
+
+            helpers.testFulfilled("should allow non-functions (undefined) in fulfill handler", "hey there", function (promise, done) {
+                var defer = subject.defer(),
+                    nonFunction = undefined;
+
+                promise
+                    .then(nonFunction)
+                    .then(function (value) {
+                        expect(value).toBe("hey there");
+                        done();
+                    });
+            });
        });
 
         describe("reject", function () {
@@ -414,6 +438,30 @@
                 runs(function () {
                     expect(spy).toHaveBeenCalledWith(secondDefer.promise);
                 });
+            });
+
+            helpers.testRejected("should allow non-functions (an integer) in reject handler", error, function (promise, done) {
+                var defer = subject.defer(),
+                    nonFunction = 42;
+
+                promise
+                    .then(null, nonFunction)
+                    .then(null, function (value) {
+                        expect(value).toBe(error);
+                        done();
+                    });
+            });
+
+            helpers.testRejected("should allow non-functions (undefined) in reject handler", error, function (promise, done) {
+                var defer = subject.defer(),
+                    nonFunction = undefined;
+
+                promise
+                    .then(null, nonFunction)
+                    .then(null, function (value) {
+                        expect(value).toBe(error);
+                        done();
+                    });
             });
         });
 
