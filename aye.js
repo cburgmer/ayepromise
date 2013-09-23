@@ -10,7 +10,6 @@
     var isPromiseLike = function (obj) {
         return obj !== null
             && typeof obj === "object"
-            && typeof obj.isPending === "function"
             && typeof obj.then === "function";
     };
 

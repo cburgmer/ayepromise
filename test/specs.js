@@ -206,8 +206,7 @@
             });
 
             helpers.testFulfilled("should allow non-functions (an integer) in fulfill handler", "hey there", function (promise, done) {
-                var defer = subject.defer(),
-                    nonFunction = 42;
+                var nonFunction = 42;
 
                 promise
                     .then(nonFunction)
@@ -218,13 +217,27 @@
             });
 
             helpers.testFulfilled("should allow non-functions (undefined) in fulfill handler", "hey there", function (promise, done) {
-                var defer = subject.defer(),
-                    nonFunction = undefined;
+                var nonFunction = undefined;
 
                 promise
                     .then(nonFunction)
                     .then(function (value) {
                         expect(value).toBe("hey there");
+                        done();
+                    });
+            });
+
+            helpers.testFulfilled("should accept a pseudo promise", null, function (promise, done) {
+                promise
+                    .then(function () {
+                        return {
+                            then: function (f) {
+                                f(42);
+                            }
+                        };
+                    })
+                    .then(function (value) {
+                        expect(value).toBe(42);
                         done();
                     });
             });
@@ -441,8 +454,7 @@
             });
 
             helpers.testRejected("should allow non-functions (an integer) in reject handler", error, function (promise, done) {
-                var defer = subject.defer(),
-                    nonFunction = 42;
+                var nonFunction = 42;
 
                 promise
                     .then(null, nonFunction)
@@ -453,8 +465,7 @@
             });
 
             helpers.testRejected("should allow non-functions (undefined) in reject handler", error, function (promise, done) {
-                var defer = subject.defer(),
-                    nonFunction = undefined;
+                var nonFunction = undefined;
 
                 promise
                     .then(null, nonFunction)
