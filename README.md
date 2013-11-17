@@ -2,7 +2,7 @@
 Aye, promise!
 -------------
 
-ayepromise is a teeny-tiny promise library. It promises to pass the [Promises/A+](http://promises-aplus.github.io/promises-spec/) Compliance Test Suite right now (and not just eventually in the future).
+ayepromise is a teeny-tiny promise library. It used to promise to pass the [Promises/A+](http://promises-aplus.github.io/promises-spec/) Compliance Test Suite, but with new changes to the spec, this might only become true eventually in the future.
 
 Aye tries to be fully compatible with [kriskowal's Q](https://github.com/kriskowal/q) in such a way that you can always replace ```aye``` with ```Q```. It will however not try to implement anything close to the full feature set. Check ```test/CompatibilitySpecRunner.html``` to see Aye's test suite executed against Q.
 
