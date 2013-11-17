@@ -40,17 +40,12 @@ Make an existing "old-school" function promise aware:
         return defer.promise;
     };
 
-Install
--------
-
-    $ bower install aye
-
 Run the test suite
 ------------------
 
 * Browser:
 
-    First install dependencies via ```bower install```. Point your browser to ```test/SpecRunner.html``` and ```test/CompatibilitySpecRunner.html```.
+    First install dependencies via ```npm install``` and ```bower install```. Point your browser to ```test/SpecRunner.html``` and ```test/CompatibilitySpecRunner.html```.
 
 * Node:
 
@@ -58,4 +53,4 @@ Run the test suite
 
 * Promise/A+ Compliance Test Suite:
 
-        $ promises-aplus-tests test/complianceTestSuiteAdapter.js
+        $ PATH=./node_modules/.bin/:$PATH promises-aplus-tests test/complianceTestSuiteAdapter.js
