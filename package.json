@@ -1,8 +1,9 @@
 {
+    "version": "0.0.2",
     "name": "ayepromise",
     "main": "./ayepromise.js",
     "description": "A teeny-tiny promise library",
-    "homepage": "http://github.com/cburgmer/aye",
+    "homepage": "http://github.com/cburgmer/ayepromise",
     "author": "Christoph Burgmer <christoph.burgmer@gmail.com>",
     "keywords": [
         "q",
@@ -22,7 +23,6 @@
         "q": ">=0.9.5",
         "promises-aplus-tests": "*"
     },
-    "version": "0.0.2",
     "scripts": {
         "test": "cd test; jasmine-node --verbose . && promises-aplus-tests complianceTestSuiteAdapter.js"
     }
