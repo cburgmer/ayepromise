@@ -1,4 +1,4 @@
 var specs = specs || require('./specs.js'),
-    aye = aye || require('../aye.js');
+    ayepromise = ayepromise || require('../ayepromise.js');
 
-specs(aye, "aye");
+specs(ayepromise, "ayepromise");

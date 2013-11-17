@@ -2,10 +2,10 @@
     if (typeof module !== 'undefined') {
         module.exports = definition();
     } else {
-        this.aye = definition();
+        this.ayepromise = definition();
     }
 })(function () {
-    var aye = {};
+    var ayepromise = {};
 
     var isPromiseLike = function (obj) {
         return obj !== null
@@ -43,7 +43,7 @@
     };
 
     var aCallChainLink = function (onFulfilled, onRejected) {
-        var defer = aye.defer();
+        var defer = ayepromise.defer();
         return {
             promise: defer.promise,
             callFulfilled: function (value) {
@@ -55,7 +55,7 @@
         }
     };
 
-    aye.defer = function () {
+    ayepromise.defer = function () {
         var pending = true,
             fulfilled,
             outcome,
@@ -130,5 +130,5 @@
         };
     };
 
-    return aye;
+    return ayepromise;
 });

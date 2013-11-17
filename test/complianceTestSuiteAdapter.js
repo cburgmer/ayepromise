@@ -1,8 +1,8 @@
-var aye = require('../aye.js');
+var ayepromise = require('../ayepromise.js');
 
 module.exports = {
     pending: function () {
-        var defer = aye.defer();
+        var defer = ayepromise.defer();
         return {
             promise: defer.promise,
             fulfill: defer.resolve,

@@ -1,6 +1,6 @@
 {
-    "name": "aye",
-    "main": "./aye.js",
+    "name": "ayepromise",
+    "main": "./ayepromise.js",
     "description": "A teeny-tiny promise library",
     "homepage": "http://github.com/cburgmer/aye",
     "author": "Christoph Burgmer <christoph.burgmer@gmail.com>",
