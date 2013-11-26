@@ -1,10 +1,12 @@
-(function (definition) {
-    if (typeof module !== 'undefined') {
-        module.exports = definition();
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        define(factory);
+    } else if (typeof exports === 'object') {
+        module.exports = factory();
     } else {
-        this.ayepromise = definition();
-    }
-})(function () {
+        root.ayepromise = factory();
+  }
+}(this, function () {
     var ayepromise = {};
 
     var isPromiseLike = function (obj) {
@@ -137,4 +139,4 @@
     };
 
     return ayepromise;
-});
+}));
