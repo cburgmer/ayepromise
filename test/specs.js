@@ -47,6 +47,49 @@
 
                 defer.resolve(null);
             });
+
+            it("should not fulfill an already fulfilled promise", function () {
+                var defer = subject.defer(),
+                    onFulfillCallback = jasmine.createSpy('onFulfill'),
+                    done = false;
+                defer.promise.then(onFulfillCallback);
+                defer.resolve(null);
+
+                setTimeout(function() {
+                    onFulfillCallback.reset();
+                    defer.resolve(42);
+
+                    setTimeout(function() {
+                        expect(onFulfillCallback).not.toHaveBeenCalled();
+                        done = true;
+                    }, 10);
+                }, 10);
+
+                waitsFor(function () {
+                    return done;
+                });
+            });
+
+            it("should not fulfill a rejected promise", function () {
+                var defer = subject.defer(),
+                    onFulfillCallback = jasmine.createSpy('onFulfill'),
+                    done = false;
+                defer.promise.then(onFulfillCallback);
+                defer.reject(new Error('just because'));
+
+                setTimeout(function() {
+                    defer.resolve(42);
+
+                    setTimeout(function() {
+                        expect(onFulfillCallback).not.toHaveBeenCalled();
+                        done = true;
+                    }, 10);
+                }, 10);
+
+                waitsFor(function () {
+                    return done;
+                });
+            });
         });
 
         describe("on fulfill callback", function () {
@@ -255,7 +298,7 @@
                     });
                 isDone = true;
             });
-       });
+        });
 
         describe("reject", function () {
             it("should resolve a promise on reject", function () {
@@ -273,6 +316,49 @@
                 defer.reject(error);
 
                 expect(defer.promise.valueOf().exception).toBe(error);
+            });
+
+            it("should not reject a fulfilled promise", function () {
+                var defer = subject.defer(),
+                    onRejectCallback = jasmine.createSpy('onReject'),
+                    done = false;
+                defer.promise.then(null, onRejectCallback);
+                defer.resolve(null);
+
+                setTimeout(function() {
+                    defer.reject(new Error('because'));
+
+                    setTimeout(function() {
+                        expect(onRejectCallback).not.toHaveBeenCalled();
+                        done = true;
+                    }, 10);
+                }, 10);
+
+                waitsFor(function () {
+                    return done;
+                });
+            });
+
+            it("should not reject a rejected promise", function () {
+                var defer = subject.defer(),
+                    onRejectCallback = jasmine.createSpy('onReject'),
+                    done = false;
+                defer.promise.then(null, onRejectCallback);
+                defer.reject(new Error('original reason'));
+
+                setTimeout(function() {
+                    onRejectCallback.reset();
+                    defer.reject(new Error('because'));
+
+                    setTimeout(function() {
+                        expect(onRejectCallback).not.toHaveBeenCalled();
+                        done = true;
+                    }, 10);
+                }, 10);
+
+                waitsFor(function () {
+                    return done;
+                });
             });
         });
 

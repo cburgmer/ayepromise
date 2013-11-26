@@ -98,6 +98,9 @@
 
         return {
             resolve: function (value) {
+                if (!pending) {
+                    return;
+                }
                 if (isPromiseLike(value)) {
                     value.then(doFulfill, doReject);
                 } else {
@@ -105,6 +108,9 @@
                 }
             },
             reject: function (value) {
+                if (!pending) {
+                    return;
+                }
                 doReject(value);
             },
             promise: {
