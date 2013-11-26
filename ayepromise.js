@@ -8,9 +8,9 @@
     var ayepromise = {};
 
     var isPromiseLike = function (obj) {
-        return obj !== null
-            && typeof obj === "object"
-            && typeof obj.then === "function";
+        return obj !== null &&
+            typeof obj === "object" &&
+            typeof obj.then === "function";
     };
 
     var doChainCall = function (defer, func, value) {
@@ -52,7 +52,7 @@
             callRejected: function (value) {
                 doRejectCall(defer, onRejected, value);
             }
-        }
+        };
     };
 
     ayepromise.defer = function () {

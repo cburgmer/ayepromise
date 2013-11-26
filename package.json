@@ -1,29 +1,30 @@
 {
-    "version": "0.0.2",
-    "name": "ayepromise",
-    "main": "./ayepromise.js",
-    "description": "A teeny-tiny promise library",
-    "homepage": "http://github.com/cburgmer/ayepromise",
-    "author": "Christoph Burgmer <christoph.burgmer@gmail.com>",
-    "keywords": [
-        "q",
-        "promise",
-        "promises",
-        "promises-a",
-        "promises-aplus",
-        "deferred",
-        "future",
-        "async",
-        "flow control",
-        "browser",
-        "node"
-    ],
-    "devDependencies": {
-        "jasmine-node": "~1.11",
-        "q": "*",
-        "promises-aplus-tests": "*"
-    },
-    "scripts": {
-        "test": "jasmine-node test --captureExceptions && promises-aplus-tests test/complianceTestSuiteAdapter.js || echo \"ignoring promises test suite results for now\""
-    }
+  "version": "0.0.2",
+  "name": "ayepromise",
+  "main": "./ayepromise.js",
+  "description": "A teeny-tiny promise library",
+  "homepage": "http://github.com/cburgmer/ayepromise",
+  "author": "Christoph Burgmer <christoph.burgmer@gmail.com>",
+  "keywords": [
+    "q",
+    "promise",
+    "promises",
+    "promises-a",
+    "promises-aplus",
+    "deferred",
+    "future",
+    "async",
+    "flow control",
+    "browser",
+    "node"
+  ],
+  "devDependencies": {
+    "jasmine-node": "~1.11",
+    "q": "*",
+    "promises-aplus-tests": "*",
+    "jshint": "~2.3.0"
+  },
+  "scripts": {
+    "test": "jshint ayepromise.js test/*.js && jasmine-node test --captureExceptions && promises-aplus-tests test/complianceTestSuiteAdapter.js || echo \"ignoring promises test suite results for now\""
+  }
 }

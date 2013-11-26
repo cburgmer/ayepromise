@@ -217,7 +217,7 @@
 
                 promise
                     .then(function () {
-                        return defer.promise
+                        return defer.promise;
                     })
                     .then(function (value) {
                         expect(value).toBe("99");
@@ -264,7 +264,7 @@
             });
 
             helpers.testFulfilled("should allow non-functions (undefined) in fulfill handler", "hey there", function (promise, done) {
-                var nonFunction = undefined;
+                var nonFunction;
 
                 promise
                     .then(nonFunction)
@@ -363,7 +363,7 @@
         });
 
         describe("on reject callback", function () {
-            var error = new Error("didn't work out, sorry")
+            var error = new Error("didn't work out, sorry");
             helpers.testRejected("should execute a fail callback", null, function (promise, done) {
                 promise.then(null, function () {
                     done();
@@ -482,7 +482,7 @@
                     .then(anotherSpy, function () {
                         expect(anotherSpy).not.toHaveBeenCalled();
                         done();
-                    })
+                    });
 
                 defer.reject(new Error());
             });
@@ -565,7 +565,7 @@
             });
 
             helpers.testRejected("should allow non-functions (undefined) in reject handler", error, function (promise, done) {
-                var nonFunction = undefined;
+                var nonFunction;
 
                 promise
                     .then(null, nonFunction)
