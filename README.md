@@ -1,12 +1,16 @@
-[![Build Status](https://secure.travis-ci.org/cburgmer/ayepromise.png?branch=master)](http://travis-ci.org/cburgmer/ayepromise)
+<a href="http://promises-aplus.github.com/promises-spec">
+    <img src="http://promises-aplus.github.com/promises-spec/assets/logo-small.png"
+         align="right" alt="Promises/A+ logo" />
+</a>
+
 Aye, promise!
 -------------
 
 ayepromise is a teeny-tiny promise library. It used to promise to pass the [Promises/A+](http://promises-aplus.github.io/promises-spec/) Compliance Test Suite 1.0, but with new changes to the spec, this might only become true for 1.1 eventually in the future.
 
-Aye tries to be fully compatible with [kriskowal's Q](https://github.com/kriskowal/q) in such a way that you can always replace ```aye``` with ```Q```. It will however not try to implement anything close to the full feature set. Check ```test/CompatibilitySpecRunner.html``` to see Aye's test suite executed against Q.
+Aye tries to be fully compatible with [kriskowal's Q](https://github.com/kriskowal/q) in such a way that you can always replace ```aye``` with ```Q```. It will not however try to implement anything close to the full feature set. Check ```test/CompatibilitySpecRunner.html``` to see ayepromise's test suite executed against Q.
 
-[![Promises/A+ 1.0 compliant](http://promisesaplus.com/assets/logo-small.png)](http://promisesaplus.com/)
+[![Build Status](https://secure.travis-ci.org/cburgmer/ayepromise.png?branch=master)](http://travis-ci.org/cburgmer/ayepromise)
 
 Why?
 ----
