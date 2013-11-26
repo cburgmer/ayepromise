@@ -43,14 +43,6 @@ Make an existing "old-school" function promise aware:
 Run the test suite
 ------------------
 
-* Browser:
+For the browser, first install dependencies via ```npm install``` and ```bower install``` and then ```open test/SpecRunner.html```.
 
-    First install dependencies via ```npm install``` and ```bower install```. Point your browser to ```test/SpecRunner.html``` and ```test/CompatibilitySpecRunner.html```.
-
-* Node:
-
-    Install dependencies via ```npm install``` and run ```npm test```.
-
-* Promise/A+ Compliance Test Suite:
-
-        $ PATH=./node_modules/.bin/:$PATH promises-aplus-tests test/complianceTestSuiteAdapter.js
+For NodeJS install dependencies via ```npm install``` and run ```npm test```. This includes the [Promise/A+ Compliance Test Suite](https://github.com/promises-aplus/promises-tests).
