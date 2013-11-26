@@ -98,7 +98,7 @@
                 followingPromise.then(yetAnotherSpy);
 
                 waitsFor(function () {
-                    return spy.wasCalled && yetAnotherSpy.wasCalled;
+                    return yetAnotherSpy.wasCalled;
                 });
 
                 runs(function () {
