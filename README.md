@@ -44,9 +44,10 @@ Make an existing "old-school" function promise aware:
         return defer.promise;
     };
 
-Run the test suite
-------------------
+Build minified source and run the test suite
+--------------------------------------------
 
-For the browser, first install dependencies via ```npm install``` and ```bower install``` and then ```open test/SpecRunner.html```.
+For NodeJS install ```gulp``` and dependencies via ```npm install```. Then run ```gulp```. This includes the [Promise/A+ Compliance Test Suite](https://github.com/promises-aplus/promises-tests).
 
-For NodeJS install dependencies via ```npm install``` and run ```npm test```. This includes the [Promise/A+ Compliance Test Suite](https://github.com/promises-aplus/promises-tests).
+For the test suite in the browser, first install dependencies via ```npm install``` and ```bower install``` and then ```open test/SpecRunner.html```.
+
