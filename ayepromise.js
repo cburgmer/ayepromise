@@ -117,7 +117,9 @@
                 try {
                     thenable(transparentlyResolveThenablesAndFulfill, doReject);
                 } catch (e) {
-                    doReject(e);
+                    if (pending) {
+                        doReject(e);
+                    }
                 }
             } else {
                 doFulfill(value);
@@ -129,7 +131,6 @@
                 if (!pending) {
                     return;
                 }
-
                 transparentlyResolveThenablesAndFulfill(value);
             },
             reject: function (value) {
