@@ -9,10 +9,16 @@
 }(this, function () {
     var ayepromise = {};
 
-    var isPromiseLike = function (obj) {
-        return obj !== null &&
+    var getThenableIfExists = function (obj) {
+        // make sure we only access the getter once
+        var then = obj && obj.then;
+
+        if (obj !== null &&
             typeof obj === "object" &&
-            typeof obj.then === "function";
+            typeof then === "function") {
+
+            return then;
+        }
     };
 
     var doChainCall = function (defer, func, value) {
@@ -103,8 +109,10 @@
                 if (!pending) {
                     return;
                 }
-                if (isPromiseLike(value)) {
-                    value.then(doFulfill, doReject);
+
+                var thenable = getThenableIfExists(value);
+                if (thenable) {
+                    thenable(doFulfill, doReject);
                 } else {
                     doFulfill(value);
                 }
