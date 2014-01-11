@@ -30,7 +30,7 @@ gulp.task('test', function(cb) {
     gulp.run('ourTests', 'promisesAplusTests', cb);
 });
 
-gulp.task('min', ['test'], function() {
+gulp.task('min', function() {
     gulp.src('ayepromise.js')
       .pipe(uglify())
       .pipe(gulp.dest('build/'));
@@ -43,5 +43,5 @@ gulp.task('watch', function (cb) {
 });
 
 gulp.task('default', function(cb) {
-    gulp.run('min', cb);
+    gulp.run('test', 'min', cb);
 });
