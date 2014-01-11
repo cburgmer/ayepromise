@@ -110,7 +110,14 @@
                     return;
                 }
 
-                var thenable = getThenableIfExists(value);
+                var thenable;
+                try {
+                    thenable = getThenableIfExists(value);
+                } catch (e) {
+                    doReject(e);
+                    return;
+                }
+
                 if (thenable) {
                     thenable(doFulfill, doReject);
                 } else {
