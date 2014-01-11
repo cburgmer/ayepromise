@@ -9,3 +9,6 @@ deploy:
   on:
     tags: true
     repo: cburgmer/ayepromise
+branches:
+  only:
+    - master
