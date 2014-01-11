@@ -17,7 +17,7 @@
             typeof obj === "object" &&
             typeof then === "function") {
 
-            return then;
+            return then.bind(obj);
         }
     };
 
