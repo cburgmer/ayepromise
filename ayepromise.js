@@ -104,25 +104,33 @@
             return link.promise;
         };
 
+        var transparentlyResolveThenablesAndFulfill = function (value) {
+            var thenable;
+            try {
+                thenable = getThenableIfExists(value);
+            } catch (e) {
+                doReject(e);
+                return;
+            }
+
+            if (thenable) {
+                try {
+                    thenable(transparentlyResolveThenablesAndFulfill, doReject);
+                } catch (e) {
+                    doReject(e);
+                }
+            } else {
+                doFulfill(value);
+            }
+        };
+
         return {
             resolve: function (value) {
                 if (!pending) {
                     return;
                 }
 
-                var thenable;
-                try {
-                    thenable = getThenableIfExists(value);
-                } catch (e) {
-                    doReject(e);
-                    return;
-                }
-
-                if (thenable) {
-                    thenable(doFulfill, doReject);
-                } else {
-                    doFulfill(value);
-                }
+                transparentlyResolveThenablesAndFulfill(value);
             },
             reject: function (value) {
                 if (!pending) {
