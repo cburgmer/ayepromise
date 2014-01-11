@@ -30,7 +30,7 @@
   "devDependencies": {
     "jasmine-node": "~1.11",
     "q": "*",
-    "promises-aplus-tests": "1.x",
+    "promises-aplus-tests": "2.x",
     "jshint": "~2.3.0"
   },
   "scripts": {
