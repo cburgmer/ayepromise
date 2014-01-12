@@ -17,7 +17,7 @@
             typeof obj === "object" &&
             typeof then === "function") {
 
-            return then;
+            return then.bind(obj);
         }
     };
 
@@ -142,7 +142,7 @@
                         onceWrapper(doReject)
                     );
                 } catch (e) {
-                    doReject(e);
+                    onceWrapper(doReject)(e);
                 }
             } else {
                 doFulfill(value);

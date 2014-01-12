@@ -767,6 +767,32 @@
                     expect(spy).toHaveBeenCalledWith(e);
                 });
             });
+
+            it('should not reject a failing thenable after it fulfilled', function () {
+                var defer = subject.defer(),
+                    fulfillSpy = jasmine.createSpy("fulfill"),
+                    rejectSpy = jasmine.createSpy("reject"),
+                    p = defer.promise.then(function () {
+                        return {
+                            then: function (onFulfill) {
+                                onFulfill(1);
+                                throw new Error("an error");
+                            }
+                        };
+                    });
+
+                p.then(fulfillSpy, rejectSpy);
+                defer.resolve();
+
+                waitsFor(function () {
+                    return fulfillSpy.wasCalled;
+                });
+
+                runs(function () {
+                    expect(fulfillSpy).toHaveBeenCalledWith(1);
+                    expect(rejectSpy).not.toHaveBeenCalled();
+                });
+            });
         });
     });
 });
