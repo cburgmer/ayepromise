@@ -117,10 +117,14 @@
 
             if (isPromiseLike(value)) {
                 onceWrapper = once();
-                value.then(
-                    onceWrapper(transparentlyResolveThenablesAndFulfill),
-                    onceWrapper(doReject)
-                );
+                try {
+                    value.then(
+                        onceWrapper(transparentlyResolveThenablesAndFulfill),
+                        onceWrapper(doReject)
+                    );
+                } catch (e) {
+                    doReject(e);
+                }
             } else {
                 doFulfill(value);
             }

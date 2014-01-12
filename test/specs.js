@@ -703,6 +703,21 @@
                     expect(rejectSpy).not.toHaveBeenCalled();
                 });
             });
+
+            helpers.testFulfilled("should handle a failing thenable", null, function (promise, done) {
+                var error = new Error("error");
+
+                promise.then(function () {
+                    return {
+                        then: function () {
+                            throw error;
+                        }
+                    };
+                }).then(null, function (e) {
+                    expect(e).toBe(error);
+                    done();
+                });
+            });
         });
     });
 });
