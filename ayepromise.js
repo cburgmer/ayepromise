@@ -104,6 +104,19 @@
             return link.promise;
         };
 
+        var once = function () {
+            var wasCalled = false;
+            return function wrapper(wrappedFunction) {
+                return function () {
+                    if (wasCalled) {
+                        return;
+                    }
+                    wasCalled = true;
+                    wrappedFunction.apply(null, arguments);
+                };
+            };
+        };
+
         var transparentlyResolveThenablesAndFulfill = function (value) {
             var thenable;
             try {
@@ -113,9 +126,14 @@
                 return;
             }
 
+            var onceWrapper;
+
             if (thenable) {
+                onceWrap = once();
                 try {
-                    thenable(transparentlyResolveThenablesAndFulfill, doReject);
+                    thenable(
+                        onceWrap(transparentlyResolveThenablesAndFulfill),
+                        onceWrap(doReject));
                 } catch (e) {
                     if (pending) {
                         doReject(e);
