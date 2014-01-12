@@ -274,21 +274,6 @@
                     });
             });
 
-            helpers.testFulfilled("should accept a pseudo promise", null, function (promise, done) {
-                promise
-                    .then(function () {
-                        return {
-                            then: function (f) {
-                                f(42);
-                            }
-                        };
-                    })
-                    .then(function (value) {
-                        expect(value).toBe(42);
-                        done();
-                    });
-            });
-
             helpers.testFulfilled("should return before calling handler", null, function (promise, done) {
                 var isDone = false;
                 promise
@@ -603,6 +588,42 @@
                 runs(function () {
                     expect(spy).toHaveBeenCalledWith(error);
                 });
+            });
+        });
+
+        describe("resolve thenables", function () {
+            helpers.testFulfilled("should accept a pseudo promise", null, function (promise, done) {
+                promise
+                    .then(function () {
+                        return {
+                            then: function (f) {
+                                f(42);
+                            }
+                        };
+                    })
+                    .then(function (value) {
+                        expect(value).toBe(42);
+                        done();
+                    });
+            });
+
+            helpers.testFulfilled("should recursively resolve promises", null, function (promise, done) {
+                promise
+                    .then(function () {
+                        return {
+                            then: function (f) {
+                                f({
+                                    then: function (f) {
+                                        f(42);
+                                    }
+                                });
+                            }
+                        };
+                    })
+                    .then(function (value) {
+                        expect(value).toBe(42);
+                        done();
+                    });
             });
         });
 

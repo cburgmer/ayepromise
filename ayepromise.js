@@ -112,22 +112,26 @@
             return link.promise;
         };
 
+        var transparentlyResolveThenablesAndFulfill = function (value) {
+            var onceWrapper;
+
+            if (isPromiseLike(value)) {
+                onceWrapper = once();
+                value.then(
+                    onceWrapper(transparentlyResolveThenablesAndFulfill),
+                    onceWrapper(doReject)
+                );
+            } else {
+                doFulfill(value);
+            }
+        };
+
         return {
             resolve: function (value) {
                 if (!pending) {
                     return;
                 }
-
-                var onceWrapper;
-                if (isPromiseLike(value)) {
-                    onceWrapper = once();
-                    value.then(
-                        onceWrapper(doFulfill),
-                        onceWrapper(doReject)
-                    );
-                } else {
-                    doFulfill(value);
-                }
+                transparentlyResolveThenablesAndFulfill(value);
             },
             reject: function (value) {
                 if (!pending) {
