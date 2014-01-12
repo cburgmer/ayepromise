@@ -605,5 +605,83 @@
                 });
             });
         });
+
+        describe("rogue thenables", function () {
+            it('should not call fulfill more than once', function () {
+                var defer = subject.defer(),
+                    spy = jasmine.createSpy("call me"),
+                    p = defer.promise.then(function () {
+                        return {
+                            then: function (onFulfill) {
+                                onFulfill(1);
+                                onFulfill(2);
+                            }
+                        };
+                    });
+
+                p.then(spy);
+                defer.resolve();
+
+                waitsFor(function () {
+                    return spy.wasCalled;
+                });
+
+                runs(function () {
+                    expect(spy).toHaveBeenCalledWith(1);
+                    expect(spy).not.toHaveBeenCalledWith(2);
+                });
+            });
+
+            it('should not call reject more than once', function () {
+                var defer = subject.defer(),
+                    spy = jasmine.createSpy("call me"),
+                    p = defer.promise.then(function () {
+                        return {
+                            then: function (onFulfill, onReject) {
+                                onReject(1);
+                                onReject(2);
+                            }
+                        };
+                    });
+
+                p.then(null, spy);
+                defer.resolve();
+
+                waitsFor(function () {
+                    return spy.wasCalled;
+                });
+
+                runs(function () {
+                    expect(spy).toHaveBeenCalledWith(1);
+                    expect(spy).not.toHaveBeenCalledWith(2);
+                });
+            });
+
+            it('should not call fulfill and reject together', function () {
+                var defer = subject.defer(),
+                    fulfillSpy = jasmine.createSpy("fulfill"),
+                    rejectSpy = jasmine.createSpy("reject"),
+                    p = defer.promise.then(function () {
+                        return {
+                            then: function (onFulfill, onReject) {
+                                onFulfill(1);
+                                onReject(2);
+                            }
+                        };
+                    });
+
+                p.then(fulfillSpy, rejectSpy);
+                defer.resolve();
+
+                waitsFor(function () {
+                    return fulfillSpy.wasCalled;
+                });
+
+                runs(function () {
+                    expect(fulfillSpy).toHaveBeenCalledWith(1);
+                    expect(rejectSpy).not.toHaveBeenCalled();
+                });
+            });
+        });
     });
 });

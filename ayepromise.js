@@ -57,6 +57,20 @@
         };
     };
 
+    var once = function () {
+        var wasCalled = false;
+
+        return function wrapper(wrappedFunction) {
+            return function () {
+                if (wasCalled) {
+                    return;
+                }
+                wasCalled = true;
+                wrappedFunction.apply(null, arguments);
+            };
+        };
+    };
+
     ayepromise.defer = function () {
         var pending = true,
             fulfilled,
@@ -103,8 +117,14 @@
                 if (!pending) {
                     return;
                 }
+
+                var onceWrapper;
                 if (isPromiseLike(value)) {
-                    value.then(doFulfill, doReject);
+                    onceWrapper = once();
+                    value.then(
+                        onceWrapper(doFulfill),
+                        onceWrapper(doReject)
+                    );
                 } else {
                     doFulfill(value);
                 }
