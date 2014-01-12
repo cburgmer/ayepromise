@@ -79,5 +79,13 @@
         subject = theSubject;
     };
 
+    helpers.testFulfilledIfNotQ = function (testName, libraryName, value, test) {
+        if (libraryName !== 'q') {
+            helpers.testFulfilled(testName, value, test);
+        } else {
+            console.log('Warning: "' + testName + '" is disabled for library ' + libraryName);
+        }
+    };
+
     return helpers;
 });

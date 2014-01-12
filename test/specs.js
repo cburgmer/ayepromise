@@ -625,6 +625,28 @@
                         done();
                     });
             });
+
+            helpers.testFulfilledIfNotQ('should access "then" getter only once', libraryName, null, function (promise, done) {
+                var getterCallCount = 0;
+
+                promise
+                    .then(function () {
+                        return Object.create(null, {
+                            then: {
+                                get: function () {
+                                    getterCallCount += 1;
+                                    return function (onFulfilled) {
+                                        onFulfilled();
+                                    };
+                                }
+                            }
+                        });
+                    })
+                    .then(function () {
+                        expect(getterCallCount).toBe(1);
+                        done();
+                    });
+            });
         });
 
         describe("rogue thenables", function () {

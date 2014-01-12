@@ -9,10 +9,16 @@
 }(this, function () {
     var ayepromise = {};
 
-    var isPromiseLike = function (obj) {
-        return obj !== null &&
+    var getThenableIfExists = function (obj) {
+        // make sure we only access the accessor once
+        var then = obj && obj.then;
+
+        if (obj !== null &&
             typeof obj === "object" &&
-            typeof obj.then === "function";
+            typeof then === "function") {
+
+            return then;
+        }
     };
 
     var doChainCall = function (defer, func, value) {
@@ -113,12 +119,13 @@
         };
 
         var transparentlyResolveThenablesAndFulfill = function (value) {
-            var onceWrapper;
+            var onceWrapper,
+                thenable = getThenableIfExists(value);
 
-            if (isPromiseLike(value)) {
+            if (thenable) {
                 onceWrapper = once();
                 try {
-                    value.then(
+                    thenable(
                         onceWrapper(transparentlyResolveThenablesAndFulfill),
                         onceWrapper(doReject)
                     );
