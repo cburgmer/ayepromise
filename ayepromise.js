@@ -30,7 +30,12 @@
                 defer.reject(e);
                 return;
             }
-            defer.resolve(returnValue);
+
+            if (returnValue === defer.promise) {
+                defer.reject(new TypeError('Cannot resolve promise with itself'));
+            } else {
+                defer.resolve(returnValue);
+            }
         }, 1);
     };
 
