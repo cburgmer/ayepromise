@@ -87,5 +87,13 @@
         }
     };
 
+    helpers.ifNotQIt = function (testName, libraryName, test) {
+        if (libraryName !== 'q') {
+            it(testName, test);
+        } else {
+            console.log('Warning: "' + testName + '" is disabled for library ' + libraryName);
+        }
+    };
+
     return helpers;
 });

@@ -740,6 +740,33 @@
                     done();
                 });
             });
+
+            ifNotQIt('should reject when thenable accessor throws an error', libraryName, function () {
+                var defer = subject.defer(),
+                    spy = jasmine.createSpy('call me');
+                    e = new Error('error');
+
+                defer.resolve();
+                defer.promise
+                    .then(function () {
+                        return Object.create(null, {
+                            then: {
+                                get: function () {
+                                    throw e;
+                                }
+                            }
+                        });
+                    })
+                    .then(null, spy);
+
+                waitsFor(function() {
+                    return spy.wasCalled;
+                });
+
+                runs(function () {
+                    expect(spy).toHaveBeenCalledWith(e);
+                });
+            });
         });
     });
 });

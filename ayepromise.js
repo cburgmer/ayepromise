@@ -120,7 +120,14 @@
 
         var transparentlyResolveThenablesAndFulfill = function (value) {
             var onceWrapper,
+                thenable;
+
+            try {
                 thenable = getThenableIfExists(value);
+            } catch (e) {
+                doReject(e);
+                return;
+            }
 
             if (thenable) {
                 onceWrapper = once();
