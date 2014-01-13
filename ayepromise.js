@@ -1,3 +1,4 @@
+// UMD header
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         define(factory);
@@ -9,8 +10,24 @@
 }(this, function () {
     var ayepromise = {};
 
+    /* Wrap an arbitrary number of functions and allow only one of them to be
+       executed and only once */
+    var once = function () {
+        var wasCalled = false;
+
+        return function wrapper(wrappedFunction) {
+            return function () {
+                if (wasCalled) {
+                    return;
+                }
+                wasCalled = true;
+                wrappedFunction.apply(null, arguments);
+            };
+        };
+    };
+
     var getThenableIfExists = function (obj) {
-        // make sure we only access the accessor once
+        // Make sure we only access the accessor once
         var then = obj && obj.then;
 
         if (obj !== null &&
@@ -68,21 +85,7 @@
         };
     };
 
-    var once = function () {
-        var wasCalled = false;
-
-        return function wrapper(wrappedFunction) {
-            return function () {
-                if (wasCalled) {
-                    return;
-                }
-                wasCalled = true;
-                wrappedFunction.apply(null, arguments);
-            };
-        };
-    };
-
-    // states
+    // States
     var PENDING = 0,
         FULFILLED = 1,
         REJECTED = 2;
@@ -101,13 +104,21 @@
             });
         };
 
-        var doReject = function (value) {
+        var doReject = function (error) {
             state = REJECTED;
-            outcome = value;
+            outcome = error;
 
             callbacks.forEach(function (link) {
                 link.callRejected(outcome);
             });
+        };
+
+        var executeResultHandlerDirectlyIfStateNotPendingAnymore = function (link) {
+            if (state === FULFILLED) {
+                link.callFulfilled(outcome);
+            } else if (state === REJECTED) {
+                link.callRejected(outcome);
+            }
         };
 
         var registerResultHandler = function (onFulfilled, onRejected) {
@@ -115,17 +126,26 @@
 
             callbacks.push(link);
 
-            if (state === FULFILLED) {
-                link.callFulfilled(outcome);
-            } else if (state === REJECTED) {
-                link.callRejected(outcome);
-            }
+            executeResultHandlerDirectlyIfStateNotPendingAnymore(link);
+
             return link.promise;
         };
 
+        var safelyResolveThenable = function (thenable) {
+            // Either fulfill, reject or reject with error
+            var onceWrapper = once();
+            try {
+                thenable(
+                    onceWrapper(transparentlyResolveThenablesAndFulfill),
+                    onceWrapper(doReject)
+                );
+            } catch (e) {
+                onceWrapper(doReject)(e);
+            }
+        };
+
         var transparentlyResolveThenablesAndFulfill = function (value) {
-            var onceWrapper,
-                thenable;
+            var thenable;
 
             try {
                 thenable = getThenableIfExists(value);
@@ -135,15 +155,7 @@
             }
 
             if (thenable) {
-                onceWrapper = once();
-                try {
-                    thenable(
-                        onceWrapper(transparentlyResolveThenablesAndFulfill),
-                        onceWrapper(doReject)
-                    );
-                } catch (e) {
-                    onceWrapper(doReject)(e);
-                }
+                safelyResolveThenable(thenable);
             } else {
                 doFulfill(value);
             }
