@@ -13,35 +13,7 @@
             helpers.setSubject(subject);
         });
 
-        it("should indicate a pending promise", function () {
-            var defer = subject.defer();
-
-            expect(defer.promise.isPending()).toBe(true);
-        });
-
         describe("resolve", function () {
-            it("should indicate a resolved promise", function () {
-                var defer = subject.defer();
-
-                defer.resolve();
-
-                expect(defer.promise.isPending()).toBe(false);
-            });
-
-            it("should return the result", function () {
-                var defer = subject.defer();
-
-                defer.resolve("21");
-
-                expect(defer.promise.valueOf()).toEqual("21");
-            });
-
-            it("should return the promise itself as result if the promise hasn't been resolved yet", function () {
-                var defer = subject.defer();
-
-                expect(defer.promise.valueOf()).toBe(defer.promise);
-            });
-
             it("should resolve 'null'", function () {
                 var defer = subject.defer();
 
@@ -286,23 +258,6 @@
         });
 
         describe("reject", function () {
-            it("should resolve a promise on reject", function () {
-                var defer = subject.defer();
-
-                defer.reject();
-
-                expect(defer.promise.isPending()).toBe(false);
-            });
-
-            it("should return the error", function () {
-                var defer = subject.defer(),
-                    error = new Error(21);
-
-                defer.reject(error);
-
-                expect(defer.promise.valueOf().exception).toBe(error);
-            });
-
             it("should not reject a fulfilled promise", function () {
                 var defer = subject.defer(),
                     onRejectCallback = jasmine.createSpy('onReject'),

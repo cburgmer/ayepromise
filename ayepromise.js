@@ -168,20 +168,6 @@
             resolve: onceWrapper(transparentlyResolveThenablesAndFulfill),
             reject: onceWrapper(doReject),
             promise: {
-                isPending: function () {
-                    return state === PENDING;
-                },
-                valueOf: function () {
-                    if (state === PENDING) {
-                        return this;
-                    } else if (state === FULFILLED) {
-                        return outcome;
-                    } else {
-                        return {
-                            exception: outcome
-                        };
-                    }
-                },
                 then: registerResultHandler,
                 fail: function (onRejected) {
                     return registerResultHandler(null, onRejected);
