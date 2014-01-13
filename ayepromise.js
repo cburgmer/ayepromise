@@ -149,19 +149,10 @@
             }
         };
 
+        var onceWrapper = once();
         return {
-            resolve: function (value) {
-                if (!pending) {
-                    return;
-                }
-                transparentlyResolveThenablesAndFulfill(value);
-            },
-            reject: function (value) {
-                if (!pending) {
-                    return;
-                }
-                doReject(value);
-            },
+            resolve: onceWrapper(transparentlyResolveThenablesAndFulfill),
+            reject: onceWrapper(doReject),
             promise: {
                 isPending: function () {
                     return pending;

@@ -647,6 +647,68 @@
                         done();
                     });
             });
+
+            it('should not resolve twice when waiting for a thenable', function () {
+                var defer = subject.defer(),
+                    fulfillSpy = jasmine.createSpy("fulfill"),
+                    fulfill;
+
+                defer.promise.then(fulfillSpy);
+
+                defer.resolve({
+                    then: function (onFulfill) {
+                        fulfill = onFulfill;
+                    }
+                });
+
+                defer.resolve();
+
+                waitsFor(function () {
+                    return fulfill !== undefined;
+                });
+
+                runs(function () {
+                    fulfill();
+                });
+
+                waits(50);
+
+                runs(function () {
+                    expect(fulfillSpy.callCount).toBe(1);
+                });
+            });
+
+            it('should not reject promise when waiting for a thenable from fulfilling', function () {
+                var defer = subject.defer(),
+                    fulfillSpy = jasmine.createSpy('fulfill'),
+                    rejectSpy = jasmine.createSpy('reject'),
+                    fulfill;
+
+                defer.promise.then(fulfillSpy, rejectSpy);
+
+                defer.resolve({
+                    then: function (onFulfill) {
+                        fulfill = onFulfill;
+                    }
+                });
+
+                defer.reject();
+
+                waitsFor(function () {
+                    return fulfill !== undefined;
+                });
+
+                runs(function () {
+                    fulfill();
+                });
+
+                waits(50);
+
+                runs(function () {
+                    expect(fulfillSpy).toHaveBeenCalled();
+                    expect(rejectSpy).not.toHaveBeenCalled();
+                });
+            });
         });
 
         describe("rogue thenables", function () {
