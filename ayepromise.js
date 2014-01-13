@@ -82,15 +82,18 @@
         };
     };
 
+    // states
+    var PENDING = 0,
+        FULFILLED = 1,
+        REJECTED = 2;
+
     ayepromise.defer = function () {
-        var pending = true,
-            fulfilled,
+        var state = PENDING,
             outcome,
             callbacks = [];
 
         var doFulfill = function (value) {
-            pending = false;
-            fulfilled = true;
+            state = FULFILLED;
             outcome = value;
 
             callbacks.forEach(function (link) {
@@ -99,8 +102,7 @@
         };
 
         var doReject = function (value) {
-            pending = false;
-            fulfilled = false;
+            state = REJECTED;
             outcome = value;
 
             callbacks.forEach(function (link) {
@@ -113,12 +115,10 @@
 
             callbacks.push(link);
 
-            if (!pending) {
-                if (fulfilled) {
-                    link.callFulfilled(outcome);
-                } else {
-                    link.callRejected(outcome);
-                }
+            if (state === FULFILLED) {
+                link.callFulfilled(outcome);
+            } else if (state === REJECTED) {
+                link.callRejected(outcome);
             }
             return link.promise;
         };
@@ -155,12 +155,12 @@
             reject: onceWrapper(doReject),
             promise: {
                 isPending: function () {
-                    return pending;
+                    return state === PENDING;
                 },
                 valueOf: function () {
-                    if (pending) {
+                    if (state === PENDING) {
                         return this;
-                    } else if (fulfilled) {
+                    } else if (state === FULFILLED) {
                         return outcome;
                     } else {
                         return {
