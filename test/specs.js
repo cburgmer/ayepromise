@@ -805,7 +805,7 @@
 
             helpers.ifNotQIt('should reject when thenable accessor throws an error', libraryName, function () {
                 var defer = subject.defer(),
-                    spy = jasmine.createSpy('call me');
+                    spy = jasmine.createSpy('call me'),
                     e = new Error('error');
 
                 defer.resolve();

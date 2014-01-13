@@ -6,8 +6,10 @@
         module.exports = factory();
     } else {
         root.ayepromise = factory();
-  }
+    }
 }(this, function () {
+    'use strict';
+
     var ayepromise = {};
 
     /* Wrap an arbitrary number of functions and allow only one of them to be
