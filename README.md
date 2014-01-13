@@ -6,9 +6,14 @@
 Aye, promise!
 -------------
 
-ayepromise is a teeny-tiny promise library. It promises to pass the [Promises/A+](http://promises-aplus.github.io/promises-spec/) Compliance Test Suite 1.1.
+ayepromise is a teeny-tiny promise library. It promises to pass the [Promises/A+](http://promises-aplus.github.io/promises-spec/) 1.1 Compliance Test Suite.
 
-Aye tries to be fully compatible with [kriskowal's Q](https://github.com/kriskowal/q) in such a way that you can always replace ```aye``` with ```Q```. (There's a catch: ayepromise tries to strictly follow Promises/A+ 1.1 and will differ where Q does not.) It will not however try to implement anything close to the full feature set. Check ```test/CompatibilitySpecRunner.html``` to see ayepromise's test suite executed against Q.
+Why yet another promise library?
+--------------------------------
+
+ayepromise wants to be as small as possible, staying compatible to Q while fully implementing the spec. It's licenses under WTFPL and/or BSD.
+
+ayepromise tries to be fully compatible with [kriskowal's Q](https://github.com/kriskowal/q) in such a way that you can always replace ```aye``` with ```Q```. (There's a catch: ayepromise tries to strictly follow Promises/A+ 1.1 and will differ where Q does not.) It will not however try to implement anything close to the full feature set. Check ```test/CompatibilitySpecRunner.html``` to see ayepromise's test suite executed against Q.
 
 [![Build Status](https://secure.travis-ci.org/cburgmer/ayepromise.png?branch=master)](http://travis-ci.org/cburgmer/ayepromise)
 
