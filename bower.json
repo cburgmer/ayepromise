@@ -1,6 +1,6 @@
 {
   "name": "ayepromise",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "main": "ayepromise.js",
   "devDependencies": {
     "jasmine": "~1.3.1"
