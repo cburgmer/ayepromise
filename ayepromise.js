@@ -29,7 +29,7 @@
     };
 
     var getThenableIfExists = function (obj) {
-        // Make sure we only access the accessor once
+        // Make sure we only access the accessor once as required by the spec
         var then = obj && obj.then;
 
         if (obj !== null &&
@@ -40,49 +40,42 @@
         }
     };
 
-    var doChainCall = function (defer, func, value) {
-        setTimeout(function () {
-            var returnValue;
-            try {
-                returnValue = func(value);
-            } catch (e) {
-                defer.reject(e);
-                return;
-            }
-
-            if (returnValue === defer.promise) {
-                defer.reject(new TypeError('Cannot resolve promise with itself'));
-            } else {
-                defer.resolve(returnValue);
-            }
-        }, 1);
-    };
-
-    var doFulfillCall = function (defer, onFulfilled, value) {
-        if (onFulfilled && onFulfilled.call) {
-            doChainCall(defer, onFulfilled, value);
-        } else {
-            defer.resolve(value);
-        }
-    };
-
-    var doRejectCall = function (defer, onRejected, value) {
-        if (onRejected && onRejected.call) {
-            doChainCall(defer, onRejected, value);
-        } else {
-            defer.reject(value);
-        }
-    };
-
-    var aCallChainLink = function (onFulfilled, onRejected) {
+    var aThenHandler = function (onFulfilled, onRejected) {
         var defer = ayepromise.defer();
+
+        var doHandlerCall = function (func, value) {
+            setTimeout(function () {
+                var returnValue;
+                try {
+                    returnValue = func(value);
+                } catch (e) {
+                    defer.reject(e);
+                    return;
+                }
+
+                if (returnValue === defer.promise) {
+                    defer.reject(new TypeError('Cannot resolve promise with itself'));
+                } else {
+                    defer.resolve(returnValue);
+                }
+            }, 1);
+        };
+
         return {
             promise: defer.promise,
             callFulfilled: function (value) {
-                doFulfillCall(defer, onFulfilled, value);
+                if (onFulfilled && onFulfilled.call) {
+                    doHandlerCall(onFulfilled, value);
+                } else {
+                    defer.resolve(value);
+                }
             },
             callRejected: function (value) {
-                doRejectCall(defer, onRejected, value);
+                if (onRejected && onRejected.call) {
+                    doHandlerCall(onRejected, value);
+                } else {
+                    defer.reject(value);
+                }
             }
         };
     };
@@ -95,14 +88,14 @@
     ayepromise.defer = function () {
         var state = PENDING,
             outcome,
-            callbacks = [];
+            thenHandlers = [];
 
         var doFulfill = function (value) {
             state = FULFILLED;
             outcome = value;
 
-            callbacks.forEach(function (link) {
-                link.callFulfilled(outcome);
+            thenHandlers.forEach(function (then) {
+                then.callFulfilled(outcome);
             });
         };
 
@@ -110,27 +103,27 @@
             state = REJECTED;
             outcome = error;
 
-            callbacks.forEach(function (link) {
-                link.callRejected(outcome);
+            thenHandlers.forEach(function (then) {
+                then.callRejected(outcome);
             });
         };
 
-        var executeResultHandlerDirectlyIfStateNotPendingAnymore = function (link) {
+        var executeThenHandlerDirectlyIfStateNotPendingAnymore = function (then) {
             if (state === FULFILLED) {
-                link.callFulfilled(outcome);
+                then.callFulfilled(outcome);
             } else if (state === REJECTED) {
-                link.callRejected(outcome);
+                then.callRejected(outcome);
             }
         };
 
-        var registerResultHandler = function (onFulfilled, onRejected) {
-            var link = aCallChainLink(onFulfilled, onRejected);
+        var registerThenHandler = function (onFulfilled, onRejected) {
+            var thenHandler = aThenHandler(onFulfilled, onRejected);
 
-            callbacks.push(link);
+            thenHandlers.push(thenHandler);
 
-            executeResultHandlerDirectlyIfStateNotPendingAnymore(link);
+            executeThenHandlerDirectlyIfStateNotPendingAnymore(thenHandler);
 
-            return link.promise;
+            return thenHandler.promise;
         };
 
         var safelyResolveThenable = function (thenable) {
@@ -168,9 +161,9 @@
             resolve: onceWrapper(transparentlyResolveThenablesAndFulfill),
             reject: onceWrapper(doReject),
             promise: {
-                then: registerResultHandler,
+                then: registerThenHandler,
                 fail: function (onRejected) {
-                    return registerResultHandler(null, onRejected);
+                    return registerThenHandler(null, onRejected);
                 }
             }
         };
