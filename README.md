@@ -18,6 +18,10 @@ ayepromise tries to be fully compatible with [kriskowal's Q](https://github.com/
 [![Build Status](https://secure.travis-ci.org/cburgmer/ayepromise.png?branch=master)](http://travis-ci.org/cburgmer/ayepromise)
 
 
+Requirements
+------------
+Needs `Function.prototype.bind()` (can be provided by a [polyfill](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/bind#Compatibility) for IE < 9).
+
 Run the test suite
 ------------------
 
