@@ -36,7 +36,7 @@
             typeof obj === "object" &&
             typeof then === "function") {
 
-            return then.bind(obj);
+            return function() { return then.apply(obj, arguments); };
         }
     };
 
