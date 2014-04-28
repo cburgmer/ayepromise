@@ -32,10 +32,7 @@
         // Make sure we only access the accessor once as required by the spec
         var then = obj && obj.then;
 
-        if (obj !== null &&
-            typeof obj === "object" &&
-            typeof then === "function") {
-
+        if (typeof obj === "object" && typeof then === "function") {
             return function() { return then.apply(obj, arguments); };
         }
     };
