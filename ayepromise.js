@@ -77,13 +77,8 @@
         };
     }
 
-    // States
-    var PENDING = null,
-        FULFILLED = "fulfilled",
-        REJECTED = "rejected";
-
     ayepromise.defer = function () {
-        var state = PENDING,
+        var state = null,
             outcome,
             thenHandlers = [];
 
@@ -97,8 +92,8 @@
             thenHandlers = null;
         }
 
-        function doFulfill (value) { doSettle(FULFILLED, value); }
-        function doReject (error) { doSettle(REJECTED, error); }
+        function doFulfill (value) { doSettle("fulfilled", value); }
+        function doReject (error) { doSettle("rejected", error); }
 
         function registerThenHandler (onFulfilled, onRejected) {
             var thenHandler = aThenHandler(onFulfilled, onRejected);
