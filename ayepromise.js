@@ -94,6 +94,7 @@
             thenHandlers.forEach(function (then) {
                 then.callFulfilled(outcome);
             });
+            thenHandlers = null;
         };
 
         var doReject = function (error) {
@@ -103,22 +104,19 @@
             thenHandlers.forEach(function (then) {
                 then.callRejected(outcome);
             });
-        };
-
-        var executeThenHandlerDirectlyIfSettled = function (then) {
-            if (state === FULFILLED) {
-                then.callFulfilled(outcome);
-            } else if (state === REJECTED) {
-                then.callRejected(outcome);
-            }
+            thenHandlers = null;
         };
 
         var registerThenHandler = function (onFulfilled, onRejected) {
             var thenHandler = aThenHandler(onFulfilled, onRejected);
 
-            thenHandlers.push(thenHandler);
-
-            executeThenHandlerDirectlyIfSettled(thenHandler);
+            if (state === FULFILLED) {
+                thenHandler.callFulfilled(outcome);
+            } else if (state === REJECTED) {
+                thenHandler.callRejected(outcome);
+            } else {
+                thenHandlers.push(thenHandler);
+            }
 
             return thenHandler.promise;
         };
