@@ -60,14 +60,14 @@
 
         return {
             promise: defer.promise,
-            callFulfilled: function (value) {
+            fulfilled: function (value) {
                 if (onFulfilled && onFulfilled.call) {
                     doHandlerCall(onFulfilled, value);
                 } else {
                     defer.resolve(value);
                 }
             },
-            callRejected: function (value) {
+            rejected: function (value) {
                 if (onRejected && onRejected.call) {
                     doHandlerCall(onRejected, value);
                 } else {
@@ -78,42 +78,33 @@
     };
 
     // States
-    var PENDING = 0,
-        FULFILLED = 1,
-        REJECTED = 2;
+    var PENDING = null,
+        FULFILLED = "fulfilled",
+        REJECTED = "rejected";
 
     ayepromise.defer = function () {
         var state = PENDING,
             outcome,
             thenHandlers = [];
 
-        var doFulfill = function (value) {
-            state = FULFILLED;
+        var doSettle = function (settledState, value) {
+            state = settledState;
             outcome = value;
 
             thenHandlers.forEach(function (then) {
-                then.callFulfilled(outcome);
+                then[state](outcome);
             });
             thenHandlers = null;
         };
 
-        var doReject = function (error) {
-            state = REJECTED;
-            outcome = error;
-
-            thenHandlers.forEach(function (then) {
-                then.callRejected(outcome);
-            });
-            thenHandlers = null;
-        };
+        var doFulfill = function (value) { doSettle(FULFILLED, value); };
+        var doReject = function (error) { doSettle(REJECTED, error); };
 
         var registerThenHandler = function (onFulfilled, onRejected) {
             var thenHandler = aThenHandler(onFulfilled, onRejected);
 
-            if (state === FULFILLED) {
-                thenHandler.callFulfilled(outcome);
-            } else if (state === REJECTED) {
-                thenHandler.callRejected(outcome);
+            if (state) {
+                thenHandler[state](outcome);
             } else {
                 thenHandlers.push(thenHandler);
             }
