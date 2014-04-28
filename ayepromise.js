@@ -152,14 +152,16 @@
         };
 
         var onceWrapper = once();
+        function fail (onRejected) {
+            return registerThenHandler(null, onRejected);
+        }
         return {
             resolve: onceWrapper(transparentlyResolveThenablesAndSettle),
             reject: onceWrapper(doReject),
             promise: {
                 then: registerThenHandler,
-                fail: function (onRejected) {
-                    return registerThenHandler(null, onRejected);
-                }
+                fail: fail,
+                "catch": fail
             }
         };
     };
