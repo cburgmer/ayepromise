@@ -105,7 +105,7 @@
             });
         };
 
-        var executeThenHandlerDirectlyIfStateNotPendingAnymore = function (then) {
+        var executeThenHandlerDirectlyIfSettled = function (then) {
             if (state === FULFILLED) {
                 then.callFulfilled(outcome);
             } else if (state === REJECTED) {
@@ -118,7 +118,7 @@
 
             thenHandlers.push(thenHandler);
 
-            executeThenHandlerDirectlyIfStateNotPendingAnymore(thenHandler);
+            executeThenHandlerDirectlyIfSettled(thenHandler);
 
             return thenHandler.promise;
         };
@@ -128,7 +128,7 @@
             var onceWrapper = once();
             try {
                 thenable(
-                    onceWrapper(transparentlyResolveThenablesAndFulfill),
+                    onceWrapper(transparentlyResolveThenablesAndSettle),
                     onceWrapper(doReject)
                 );
             } catch (e) {
@@ -136,7 +136,7 @@
             }
         };
 
-        var transparentlyResolveThenablesAndFulfill = function (value) {
+        var transparentlyResolveThenablesAndSettle = function (value) {
             var thenable;
 
             try {
@@ -155,7 +155,7 @@
 
         var onceWrapper = once();
         return {
-            resolve: onceWrapper(transparentlyResolveThenablesAndFulfill),
+            resolve: onceWrapper(transparentlyResolveThenablesAndSettle),
             reject: onceWrapper(doReject),
             promise: {
                 then: registerThenHandler,
