@@ -58,20 +58,29 @@
             }, 1);
         };
 
+        var callFulfilled = function (value) {
+            if (onFulfilled && onFulfilled.call) {
+                doHandlerCall(onFulfilled, value);
+            } else {
+                defer.resolve(value);
+            }
+        };
+
+        var callRejected = function (value) {
+            if (onRejected && onRejected.call) {
+                doHandlerCall(onRejected, value);
+            } else {
+                defer.reject(value);
+            }
+        };
+
         return {
             promise: defer.promise,
-            callFulfilled: function (value) {
-                if (onFulfilled && onFulfilled.call) {
-                    doHandlerCall(onFulfilled, value);
+            handle: function (state, value) {
+                if (state === FULFILLED) {
+                    callFulfilled(value);
                 } else {
-                    defer.resolve(value);
-                }
-            },
-            callRejected: function (value) {
-                if (onRejected && onRejected.call) {
-                    doHandlerCall(onRejected, value);
-                } else {
-                    defer.reject(value);
+                    callRejected(value);
                 }
             }
         };
@@ -87,35 +96,34 @@
             outcome,
             thenHandlers = [];
 
-        var doFulfill = function (value) {
-            state = FULFILLED;
+        var doSettle = function (settledState, value) {
+            state = settledState;
+            // persist for handlers registered after settling
             outcome = value;
 
             thenHandlers.forEach(function (then) {
-                then.callFulfilled(outcome);
+                then.handle(state, outcome);
             });
+
+            // Discard all references to handlers to be garbage collected
             thenHandlers = null;
         };
 
-        var doReject = function (error) {
-            state = REJECTED;
-            outcome = error;
+        var doFulfill = function (value) {
+            doSettle(FULFILLED, value);
+        };
 
-            thenHandlers.forEach(function (then) {
-                then.callRejected(outcome);
-            });
-            thenHandlers = null;
+        var doReject = function (error) {
+            doSettle(REJECTED, error);
         };
 
         var registerThenHandler = function (onFulfilled, onRejected) {
             var thenHandler = aThenHandler(onFulfilled, onRejected);
 
-            if (state === FULFILLED) {
-                thenHandler.callFulfilled(outcome);
-            } else if (state === REJECTED) {
-                thenHandler.callRejected(outcome);
-            } else {
+            if (state === PENDING) {
                 thenHandlers.push(thenHandler);
+            } else {
+                thenHandler.handle(state, outcome);
             }
 
             return thenHandler.promise;
