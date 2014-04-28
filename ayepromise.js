@@ -14,7 +14,7 @@
 
     /* Wrap an arbitrary number of functions and allow only one of them to be
        executed and only once */
-    var once = function () {
+    function once () {
         var wasCalled = false;
 
         return function wrapper(wrappedFunction) {
@@ -26,24 +26,21 @@
                 wrappedFunction.apply(null, arguments);
             };
         };
-    };
+    }
 
-    var getThenableIfExists = function (obj) {
+    function getThenableIfExists (obj) {
         // Make sure we only access the accessor once as required by the spec
         var then = obj && obj.then;
 
-        if (obj !== null &&
-            typeof obj === "object" &&
-            typeof then === "function") {
-
+        if (typeof obj === "object" && typeof then === "function") {
             return function() { return then.apply(obj, arguments); };
         }
-    };
+    }
 
-    var aThenHandler = function (onFulfilled, onRejected) {
+    function aThenHandler (onFulfilled, onRejected) {
         var defer = ayepromise.defer();
 
-        var doHandlerCall = function (func, value) {
+        function doHandlerCall (func, value) {
             setTimeout(function () {
                 var returnValue;
                 try {
@@ -59,18 +56,18 @@
                     defer.resolve(returnValue);
                 }
             }, 1);
-        };
+        }
 
         return {
             promise: defer.promise,
-            callFulfilled: function (value) {
+            fulfilled: function (value) {
                 if (onFulfilled && onFulfilled.call) {
                     doHandlerCall(onFulfilled, value);
                 } else {
                     defer.resolve(value);
                 }
             },
-            callRejected: function (value) {
+            rejected: function (value) {
                 if (onRejected && onRejected.call) {
                     doHandlerCall(onRejected, value);
                 } else {
@@ -78,68 +75,52 @@
                 }
             }
         };
-    };
-
-    // States
-    var PENDING = 0,
-        FULFILLED = 1,
-        REJECTED = 2;
+    }
 
     ayepromise.defer = function () {
-        var state = PENDING,
+        var state = null,
             outcome,
             thenHandlers = [];
 
-        var doFulfill = function (value) {
-            state = FULFILLED;
+        function doSettle (settledState, value) {
+            state = settledState;
             outcome = value;
 
             thenHandlers.forEach(function (then) {
-                then.callFulfilled(outcome);
+                then[state](outcome);
             });
-        };
+            thenHandlers = null;
+        }
 
-        var doReject = function (error) {
-            state = REJECTED;
-            outcome = error;
+        function doFulfill (value) { doSettle("fulfilled", value); }
+        function doReject (error) { doSettle("rejected", error); }
 
-            thenHandlers.forEach(function (then) {
-                then.callRejected(outcome);
-            });
-        };
-
-        var executeThenHandlerDirectlyIfStateNotPendingAnymore = function (then) {
-            if (state === FULFILLED) {
-                then.callFulfilled(outcome);
-            } else if (state === REJECTED) {
-                then.callRejected(outcome);
-            }
-        };
-
-        var registerThenHandler = function (onFulfilled, onRejected) {
+        function registerThenHandler (onFulfilled, onRejected) {
             var thenHandler = aThenHandler(onFulfilled, onRejected);
 
-            thenHandlers.push(thenHandler);
-
-            executeThenHandlerDirectlyIfStateNotPendingAnymore(thenHandler);
+            if (state) {
+                thenHandler[state](outcome);
+            } else {
+                thenHandlers.push(thenHandler);
+            }
 
             return thenHandler.promise;
-        };
+        }
 
-        var safelyResolveThenable = function (thenable) {
+        function safelyResolveThenable (thenable) {
             // Either fulfill, reject or reject with error
             var onceWrapper = once();
             try {
                 thenable(
-                    onceWrapper(transparentlyResolveThenablesAndFulfill),
+                    onceWrapper(transparentlyResolveThenablesAndSettle),
                     onceWrapper(doReject)
                 );
             } catch (e) {
                 onceWrapper(doReject)(e);
             }
-        };
+        }
 
-        var transparentlyResolveThenablesAndFulfill = function (value) {
+        function transparentlyResolveThenablesAndSettle (value) {
             var thenable;
 
             try {
@@ -154,17 +135,19 @@
             } else {
                 doFulfill(value);
             }
-        };
+        }
 
         var onceWrapper = once();
+        function fail (onRejected) {
+            return registerThenHandler(null, onRejected);
+        }
         return {
-            resolve: onceWrapper(transparentlyResolveThenablesAndFulfill),
+            resolve: onceWrapper(transparentlyResolveThenablesAndSettle),
             reject: onceWrapper(doReject),
             promise: {
                 then: registerThenHandler,
-                fail: function (onRejected) {
-                    return registerThenHandler(null, onRejected);
-                }
+                fail: fail,
+                "catch": fail
             }
         };
     };
