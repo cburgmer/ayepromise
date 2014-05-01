@@ -27,6 +27,10 @@
     "browser",
     "node"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/cburgmer/ayepromise.git"
+  },
   "devDependencies": {
     "jasmine-node": "~1.11",
     "q": "*",
