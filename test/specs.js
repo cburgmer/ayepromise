@@ -606,6 +606,37 @@
             });
         });
 
+
+        describe("inspect", function () {
+            describe("should an object which", function () {
+				it("if the promise is pending, should have 'state' set to 'pending'", function () {
+					var defer = subject.defer();
+					var isPending = defer.promise.isPending();
+					expect(isPending).toBe(true);
+					var inspection = defer.promise.inspect();
+					expect(inspection.state).toBe("pending");
+				});
+				it("if the promise is fulfilled, should have 'state' set to 'fulfilled', and 'value' set to the fulfilling value", function () {
+					var defer = subject.defer();
+					defer.resolve("fulfilling value");
+					var isFulfilled = defer.promise.isFulfilled();
+					expect(isFulfilled).toBe(true);
+					var inspection = defer.promise.inspect();
+					expect(inspection.state).toBe("fulfilled");
+					expect(inspection.value).toBe("fulfilling value");
+				});
+				it("if the promise is rejected, should have 'state' set to 'rejected', and 'reason' set to the rejecting value", function () {
+					var defer = subject.defer();
+					defer.reject("rejecting value");
+					var isRejected = defer.promise.isRejected();
+					expect(isRejected).toBe(true);
+					var inspection = defer.promise.inspect();
+					expect(inspection.state).toBe("rejected");
+					expect(inspection.reason).toBe("rejecting value");
+				});
+            });
+        });
+
         describe("isPromise", function () {
             it("should return true if called on a promise ", function () {
                 var defer = subject.defer();

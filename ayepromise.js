@@ -184,7 +184,20 @@
                 },
                 isPending: function () {
                     return state === PENDING;
-                }
+                },
+				inspect: function () {
+					var details = {};
+					if (state === PENDING) {
+						details.state = "pending";
+					} else if (state === FULFILLED) {
+						details.state = "fulfilled";
+						details.value = outcome;
+					} else if (state === REJECTED) {
+						details.state = "rejected";
+						details.reason = outcome;
+					}
+					return details;
+				}
             }
         };
     };
