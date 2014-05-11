@@ -10,7 +10,12 @@
 }(this, function () {
     'use strict';
 
-    var ayepromise = {};
+    var ayepromise = function (value) {
+		if (ayepromise.isPromise(value)) return value;
+        var wrapped = ayepromise.defer();
+        wrapped.resolve(value);
+        return wrapped;
+    };
 
     /* Wrap an arbitrary number of functions and allow only one of them to be
        executed and only once */
@@ -32,7 +37,7 @@
         // Make sure we only access the accessor once as required by the spec
         var then = obj && obj.then;
 
-        if (typeof obj === "object" && typeof then === "function") {
+        if (typeof obj === 'object' && typeof then === 'function') {
             // Bind function back to it's object (so fan's of 'this' don't get sad)
             return function() { return then.apply(obj, arguments); };
         }
@@ -168,9 +173,22 @@
                 then: registerThenHandler,
                 fail: function (onRejected) {
                     return registerThenHandler(null, onRejected);
+                },
+                isFulfilled: function () {
+                    return state === FULFILLED;
+                },
+                isRejected: function () {
+                    return state === REJECTED;
+                },
+                isPending: function () {
+                    return state === PENDING;
                 }
             }
         };
+    };
+
+    ayepromise.isPromise = function (promise) {
+        return (promise && typeof promise.then === 'function');
     };
 
     return ayepromise;
