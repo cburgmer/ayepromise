@@ -1,11 +1,11 @@
 (function (definition) {
-    if (typeof module !== 'undefined') {
+    if (typeof module !== "undefined") {
         module.exports = definition;
     } else {
         this.specs = definition;
     }
 })(function (subject, libraryName) {
-    var helpers = this.helpers || require('./helpers.js');
+    var helpers = this.helpers || require("./helpers.js");
 
     describe(libraryName, function () {
 
@@ -22,7 +22,7 @@
 
             it("should not fulfill an already fulfilled promise", function () {
                 var defer = subject.defer(),
-                    onFulfillCallback = jasmine.createSpy('onFulfill'),
+                    onFulfillCallback = jasmine.createSpy("onFulfill"),
                     done = false;
                 defer.promise.then(onFulfillCallback);
                 defer.resolve(null);
@@ -44,10 +44,10 @@
 
             it("should not fulfill a rejected promise", function () {
                 var defer = subject.defer(),
-                    onFulfillCallback = jasmine.createSpy('onFulfill'),
+                    onFulfillCallback = jasmine.createSpy("onFulfill"),
                     done = false;
                 defer.promise.then(onFulfillCallback);
-                defer.reject(new Error('just because'));
+                defer.reject(new Error("just because"));
 
                 setTimeout(function() {
                     defer.resolve(42);
@@ -260,13 +260,13 @@
         describe("reject", function () {
             it("should not reject a fulfilled promise", function () {
                 var defer = subject.defer(),
-                    onRejectCallback = jasmine.createSpy('onReject'),
+                    onRejectCallback = jasmine.createSpy("onReject"),
                     done = false;
                 defer.promise.then(null, onRejectCallback);
                 defer.resolve(null);
 
                 setTimeout(function() {
-                    defer.reject(new Error('because'));
+                    defer.reject(new Error("because"));
 
                     setTimeout(function() {
                         expect(onRejectCallback).not.toHaveBeenCalled();
@@ -281,14 +281,14 @@
 
             it("should not reject a rejected promise", function () {
                 var defer = subject.defer(),
-                    onRejectCallback = jasmine.createSpy('onReject'),
+                    onRejectCallback = jasmine.createSpy("onReject"),
                     done = false;
                 defer.promise.then(null, onRejectCallback);
-                defer.reject(new Error('original reason'));
+                defer.reject(new Error("original reason"));
 
                 setTimeout(function() {
                     onRejectCallback.reset();
-                    defer.reject(new Error('because'));
+                    defer.reject(new Error("because"));
 
                     setTimeout(function() {
                         expect(onRejectCallback).not.toHaveBeenCalled();
@@ -546,6 +546,102 @@
             });
         });
 
+        describe("isFulfilled", function () {
+            it("should return true if the promise is fulfilled", function () {
+                var defer = subject.defer();
+                defer.resolve();
+                var isFulfilled = defer.promise.isFulfilled();
+                expect(isFulfilled).toBe(true);
+            });
+            it("should return false if the promise is pending", function () {
+                var defer = subject.defer();
+                var isFulfilled = defer.promise.isFulfilled();
+                expect(isFulfilled).toBe(false);
+            });
+            it("should return false if the promise is rejected", function () {
+                var defer = subject.defer();
+                defer.reject();
+                var isFulfilled = defer.promise.isFulfilled();
+                expect(isFulfilled).toBe(false);
+            });
+        });
+
+        describe("isRejected", function () {
+            it("should return true if the promise is rejected", function () {
+                var defer = subject.defer();
+                defer.reject();
+                var isRejected = defer.promise.isRejected();
+                expect(isRejected).toBe(true);
+            });
+            it("should return false if the promise is pending", function () {
+                var defer = subject.defer();
+                var isRejected = defer.promise.isRejected();
+                expect(isRejected).toBe(false);
+            });
+            it("should return false if the promise is fulfilled", function () {
+                var defer = subject.defer();
+                defer.resolve();
+                var isRejected = defer.promise.isRejected();
+                expect(isRejected).toBe(false);
+            });
+        });
+
+        describe("isPending", function () {
+            it("should return true if the promise is pending", function () {
+                var defer = subject.defer();
+                var isPending = defer.promise.isPending();
+                expect(isPending).toBe(true);
+            });
+            it("should return false if the promise is fulfilled", function () {
+                var defer = subject.defer();
+                defer.resolve();
+                var isPending = defer.promise.isPending();
+                expect(isPending).toBe(false);
+            });
+            it("should return false if the promise is rejected", function () {
+                var defer = subject.defer();
+                defer.reject();
+                var isPending = defer.promise.isPending();
+                expect(isPending).toBe(false);
+            });
+        });
+
+        describe("isPromise", function () {
+            it("should return true if called on a promise ", function () {
+                var defer = subject.defer();
+                expect(subject.isPromise(defer.promise)).toBe(true);
+            });
+            it("should return false if called on a non-promise", function () {
+                expect(subject.isPromise("Not a promise")).toBe(false);
+            });
+        });
+
+		describe("ayepromise", function () {
+			it("should be a function", function () {
+				var type = typeof subject;
+				expect(type).toBe("function");
+			});
+			it("when called with a promise, should return said promise", function () {
+				var defer = subject.defer();
+				var promise = subject(defer.promise);
+				expect(promise).toBe(defer.promise);
+			});
+			it("when called with a non-promise value, should return a resolved promise wrapping the value", function () {
+				var promise = subject("Wrap me"),
+                    spy = jasmine.createSpy("call me");
+
+                promise.then(spy);
+
+                waitsFor(function () {
+                    return spy.wasCalled;
+                });
+
+                runs(function () {
+                    expect(spy).toHaveBeenCalledWith("Wrap me");
+                });
+			});
+		});
+
         describe("resolve thenables", function () {
             helpers.testFulfilled("should accept a pseudo promise", null, function (promise, done) {
                 promise
@@ -581,7 +677,7 @@
                     });
             });
 
-            helpers.testFulfilledIfNotQ('should access "then" getter only once', libraryName, null, function (promise, done) {
+            helpers.testFulfilledIfNotQ("should access 'then' getter only once", libraryName, null, function (promise, done) {
                 var getterCallCount = 0;
 
                 promise
@@ -603,7 +699,7 @@
                     });
             });
 
-            it('should not resolve twice when waiting for a thenable', function () {
+            it("should not resolve twice when waiting for a thenable", function () {
                 var defer = subject.defer(),
                     fulfillSpy = jasmine.createSpy("fulfill"),
                     fulfill;
@@ -633,10 +729,10 @@
                 });
             });
 
-            it('should not reject promise when waiting for a thenable from fulfilling', function () {
+            it("should not reject promise when waiting for a thenable from fulfilling", function () {
                 var defer = subject.defer(),
-                    fulfillSpy = jasmine.createSpy('fulfill'),
-                    rejectSpy = jasmine.createSpy('reject'),
+                    fulfillSpy = jasmine.createSpy("fulfill"),
+                    rejectSpy = jasmine.createSpy("reject"),
                     fulfill;
 
                 defer.promise.then(fulfillSpy, rejectSpy);
@@ -667,7 +763,7 @@
         });
 
         describe("rogue thenables", function () {
-            it('should not call fulfill more than once', function () {
+            it("should not call fulfill more than once", function () {
                 var defer = subject.defer(),
                     spy = jasmine.createSpy("call me"),
                     p = defer.promise.then(function () {
@@ -692,7 +788,7 @@
                 });
             });
 
-            it('should not call reject more than once', function () {
+            it("should not call reject more than once", function () {
                 var defer = subject.defer(),
                     spy = jasmine.createSpy("call me"),
                     p = defer.promise.then(function () {
@@ -717,7 +813,7 @@
                 });
             });
 
-            it('should not call fulfill and reject together', function () {
+            it("should not call fulfill and reject together", function () {
                 var defer = subject.defer(),
                     fulfillSpy = jasmine.createSpy("fulfill"),
                     rejectSpy = jasmine.createSpy("reject"),
@@ -758,10 +854,10 @@
                 });
             });
 
-            helpers.ifNotQIt('should reject when thenable accessor throws an error', libraryName, function () {
+            helpers.ifNotQIt("should reject when thenable accessor throws an error", libraryName, function () {
                 var defer = subject.defer(),
-                    spy = jasmine.createSpy('call me'),
-                    e = new Error('error');
+                    spy = jasmine.createSpy("call me"),
+                    e = new Error("error");
 
                 defer.resolve();
                 defer.promise
@@ -785,7 +881,7 @@
                 });
             });
 
-            it('should not reject a failing thenable after it fulfilled', function () {
+            it("should not reject a failing thenable after it fulfilled", function () {
                 var defer = subject.defer(),
                     fulfillSpy = jasmine.createSpy("fulfill"),
                     rejectSpy = jasmine.createSpy("reject"),

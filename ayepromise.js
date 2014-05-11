@@ -1,20 +1,22 @@
 // UMD header
 (function (root, factory) {
-    if (typeof define === 'function' && define.amd) {
+    if (typeof define === "function" && define.amd) {
         define(factory);
-    } else if (typeof exports === 'object') {
+    } else if (typeof exports === "object") {
         module.exports = factory();
     } else {
         root.ayepromise = factory();
     }
 }(this, function () {
-    'use strict';
+    "use strict";
 
     var ayepromise = function (value) {
-		if (ayepromise.isPromise(value)) return value;
+		if (ayepromise.isPromise(value)) {
+			return value;
+		}
         var wrapped = ayepromise.defer();
         wrapped.resolve(value);
-        return wrapped;
+        return wrapped.promise;
     };
 
     /* Wrap an arbitrary number of functions and allow only one of them to be
@@ -37,8 +39,8 @@
         // Make sure we only access the accessor once as required by the spec
         var then = obj && obj.then;
 
-        if (typeof obj === 'object' && typeof then === 'function') {
-            // Bind function back to it's object (so fan's of 'this' don't get sad)
+        if (typeof obj === "object" && typeof then === "function") {
+            // Bind function back to it"s object (so fan"s of "this" don"t get sad)
             return function() { return then.apply(obj, arguments); };
         }
     };
@@ -57,7 +59,7 @@
                 }
 
                 if (returnValue === defer.promise) {
-                    defer.reject(new TypeError('Cannot resolve promise with itself'));
+                    defer.reject(new TypeError("Cannot resolve promise with itself"));
                 } else {
                     defer.resolve(returnValue);
                 }
@@ -188,7 +190,7 @@
     };
 
     ayepromise.isPromise = function (promise) {
-        return (promise && typeof promise.then === 'function');
+        return (promise && typeof promise.then === "function");
     };
 
     return ayepromise;
