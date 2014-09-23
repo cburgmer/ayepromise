@@ -10,6 +10,8 @@ ayepromise is a teeny-tiny promise library. It promises to pass the [Promises/A+
 
 <a href="http://badge.fury.io/js/ayepromise"><img src="https://badge.fury.io/js/ayepromise.svg" alt="NPM version" height="18" align="right"></a>
 
+Supports modern browsers (i.e. IE > 8).
+
 Why yet another promise library?
 --------------------------------
 
