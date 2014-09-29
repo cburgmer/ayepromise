@@ -1,16 +1,23 @@
 // UMD header
 (function (root, factory) {
-    if (typeof define === 'function' && define.amd) {
+    if (typeof define === "function" && define.amd) {
         define(factory);
-    } else if (typeof exports === 'object') {
+    } else if (typeof exports === "object") {
         module.exports = factory();
     } else {
         root.ayepromise = factory();
     }
 }(this, function () {
-    'use strict';
+    "use strict";
 
-    var ayepromise = {};
+    var ayepromise = function (value) {
+		if (ayepromise.isPromise(value)) {
+			return value;
+		}
+        var wrapped = ayepromise.defer();
+        wrapped.resolve(value);
+        return wrapped.promise;
+    };
 
     /* Wrap an arbitrary number of functions and allow only one of them to be
        executed and only once */
@@ -33,7 +40,7 @@
         var then = obj && obj.then;
 
         if (typeof obj === "object" && typeof then === "function") {
-            // Bind function back to it's object (so fan's of 'this' don't get sad)
+            // Bind function back to it"s object (so fan"s of "this" don"t get sad)
             return function() { return then.apply(obj, arguments); };
         }
     };
@@ -52,7 +59,7 @@
                 }
 
                 if (returnValue === defer.promise) {
-                    defer.reject(new TypeError('Cannot resolve promise with itself'));
+                    defer.reject(new TypeError("Cannot resolve promise with itself"));
                 } else {
                     defer.resolve(returnValue);
                 }
@@ -168,9 +175,35 @@
                 then: registerThenHandler,
                 fail: function (onRejected) {
                     return registerThenHandler(null, onRejected);
-                }
+                },
+                isFulfilled: function () {
+                    return state === FULFILLED;
+                },
+                isRejected: function () {
+                    return state === REJECTED;
+                },
+                isPending: function () {
+                    return state === PENDING;
+                },
+				inspect: function () {
+					var details = {};
+					if (state === PENDING) {
+						details.state = "pending";
+					} else if (state === FULFILLED) {
+						details.state = "fulfilled";
+						details.value = outcome;
+					} else if (state === REJECTED) {
+						details.state = "rejected";
+						details.reason = outcome;
+					}
+					return details;
+				}
             }
         };
+    };
+
+    ayepromise.isPromise = function (promise) {
+        return (promise && typeof promise.then === "function");
     };
 
     return ayepromise;
