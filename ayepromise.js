@@ -24,7 +24,7 @@
 
 			if(console)
 			{
-				console.error('The following error was thrown, but suppressed by ayepromise, you can debug with in ayepromise.suppressedErros.', e);
+				console.error('The following error was thrown, but suppressed by ayepromise, you can debug it with ayepromise.suppressedErros.', e);
 			}
 		}
     };
