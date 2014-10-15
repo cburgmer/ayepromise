@@ -10,7 +10,24 @@
 }(this, function () {
     'use strict';
 
-    var ayepromise = {};
+    var ayepromise =
+    {
+    	suppressedErros: [],
+    	debugMode: false
+    };
+
+    var logError = function(e)
+    {
+    	if(ayepromise.debugMode)
+    	{
+			ayepromise.suppressedErros.push(e);
+
+			if(console)
+			{
+				console.error('The following error was thrown, but suppressed by ayepromise, you can debug with in ayepromise.suppressedErros.', e);
+			}
+		}
+    };
 
     /* Wrap an arbitrary number of functions and allow only one of them to be
        executed and only once */
@@ -47,6 +64,7 @@
                 try {
                     returnValue = func(value);
                 } catch (e) {
+                    logError(e);
                     defer.reject(e);
                     return;
                 }
@@ -139,6 +157,7 @@
                     onceWrapper(doReject)
                 );
             } catch (e) {
+            	 logError(e);
                 onceWrapper(doReject)(e);
             }
         };
@@ -149,6 +168,7 @@
             try {
                 thenable = getThenableIfExists(value);
             } catch (e) {
+                logError(e);
                 doReject(e);
                 return;
             }
