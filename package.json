@@ -35,7 +35,7 @@
     "jasmine-node": "~1.14",
     "q": "*",
     "promises-aplus-tests": "2.x",
-    "jshint": "~2.5.0"
+    "jshint": "~2.7.0"
   },
   "scripts": {
     "test": "jshint ayepromise.js test/*.js && jasmine-node test --captureExceptions && promises-aplus-tests test/complianceTestSuiteAdapter.js"
