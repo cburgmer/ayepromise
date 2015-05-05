@@ -99,7 +99,7 @@
 
         var doSettle = function (settledState, value) {
             state = settledState;
-            // persist for handlers registered after settling
+            // Persist for handlers registered after settling
             outcome = value;
 
             thenHandlers.forEach(function (then) {
@@ -127,6 +127,7 @@
                 thenHandler.handle(state, outcome);
             }
 
+            // Allow chaining of calls: something().then(...).then(...)
             return thenHandler.promise;
         };
 
