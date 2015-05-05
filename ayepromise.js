@@ -33,7 +33,7 @@
         var then = obj && obj.then;
 
         if (typeof obj === "object" && typeof then === "function") {
-            // Bind function back to it's object (so fan's of 'this' don't get sad)
+            // Bind function back to it's object (so lousy 'this' will work)
             return function() { return then.apply(obj, arguments); };
         }
     };
