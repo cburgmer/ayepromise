@@ -4,15 +4,7 @@
   "main": "./ayepromise.js",
   "description": "A teeny-tiny promise library",
   "homepage": "http://github.com/cburgmer/ayepromise",
-  "licenses": [
-    {
-      "name": "BSD-2-Clause",
-      "url": "http://opensource.org/licenses/BSD-2-Clause"
-    }, {
-      "name": "WTFPL",
-      "url": "http://www.wtfpl.net/txt/copying/"
-    }
-  ],
+  "license": "(BSD-2-Clause OR WTFPL)",
   "author": "Christoph Burgmer <christoph.burgmer@gmail.com>",
   "keywords": [
     "q",
